@@ -20,9 +20,7 @@ gulp.task('js', function() {
   // for efficiency not using dep management so just manually control concat order
   return gulp.src([
       './src/js/glMatrix.custom.min.js',
-      './src/js/shaders.js',
-      './src/js/buffers.js',
-      './src/js/textures.js',
+      './src/js/webgl.js',
       './src/js/index.js'
     ])
     .pipe(concat('main.js'))

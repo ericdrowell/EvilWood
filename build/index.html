@@ -5,7 +5,7 @@
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
   </head>
   <body>
-    <canvas id="sceneCanvas"></canvas>
+    <canvas id="myCanvas"></canvas>
 
     <script id="shader-fs" type="x-shader/x-fragment">
         precision mediump float;
@@ -58,6 +58,914 @@
       var GROUND_TEXTURE_ENCODING = 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==';
     </script>
 
-    <script>function getShader(r,e){var t=document.getElementById(e);if(!t)return null;for(var a="",i=t.firstChild;i;)3==i.nodeType&&(a+=i.textContent),i=i.nextSibling;var o;if("x-shader/x-fragment"==t.type)o=r.createShader(r.FRAGMENT_SHADER);else{if("x-shader/x-vertex"!=t.type)return null;o=r.createShader(r.VERTEX_SHADER)}return r.shaderSource(o,a),r.compileShader(o),r.getShaderParameter(o,r.COMPILE_STATUS)?o:(alert(r.getShaderInfoLog(o)),null)}function initShaders(){var r=getShader(gl,"shader-fs"),e=getShader(gl,"shader-vs");shaderProgram=gl.createProgram(),gl.attachShader(shaderProgram,e),gl.attachShader(shaderProgram,r),gl.linkProgram(shaderProgram),gl.getProgramParameter(shaderProgram,gl.LINK_STATUS)||alert("Could not initialise shaders"),gl.useProgram(shaderProgram),shaderProgram.vertexPositionAttribute=gl.getAttribLocation(shaderProgram,"aVertexPosition"),gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute),shaderProgram.vertexNormalAttribute=gl.getAttribLocation(shaderProgram,"aVertexNormal"),gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute),shaderProgram.textureCoordAttribute=gl.getAttribLocation(shaderProgram,"aTextureCoord"),gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute),shaderProgram.pMatrixUniform=gl.getUniformLocation(shaderProgram,"uPMatrix"),shaderProgram.mvMatrixUniform=gl.getUniformLocation(shaderProgram,"uMVMatrix"),shaderProgram.nMatrixUniform=gl.getUniformLocation(shaderProgram,"uNMatrix"),shaderProgram.samplerUniform=gl.getUniformLocation(shaderProgram,"uSampler"),shaderProgram.useLightingUniform=gl.getUniformLocation(shaderProgram,"uUseLighting"),shaderProgram.ambientColorUniform=gl.getUniformLocation(shaderProgram,"uAmbientColor"),shaderProgram.lightingDirectionUniform=gl.getUniformLocation(shaderProgram,"uLightingDirection"),shaderProgram.directionalColorUniform=gl.getUniformLocation(shaderProgram,"uDirectionalColor")}function initBuffers(){cubeVertexPositionBuffer=gl.createBuffer(),gl.bindBuffer(gl.ARRAY_BUFFER,cubeVertexPositionBuffer),vertices=[-1,-1,1,1,-1,1,1,1,1,-1,1,1,-1,-1,-1,-1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,1,1,1,1,1,1,1,-1,-1,-1,-1,1,-1,-1,1,-1,1,-1,-1,1,1,-1,-1,1,1,-1,1,1,1,1,-1,1,-1,-1,-1,-1,-1,1,-1,1,1,-1,1,-1],gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(vertices),gl.STATIC_DRAW),cubeVertexPositionBuffer.itemSize=3,cubeVertexPositionBuffer.numItems=24,cubeVertexNormalBuffer=gl.createBuffer(),gl.bindBuffer(gl.ARRAY_BUFFER,cubeVertexNormalBuffer);var r=[0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0];gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(r),gl.STATIC_DRAW),cubeVertexNormalBuffer.itemSize=3,cubeVertexNormalBuffer.numItems=24,cubeVertexTextureCoordBuffer=gl.createBuffer(),gl.bindBuffer(gl.ARRAY_BUFFER,cubeVertexTextureCoordBuffer);var e=[0,0,1,0,1,1,0,1,1,0,1,1,0,1,0,0,0,1,0,0,1,0,1,1,1,1,0,1,0,0,1,0,1,0,1,1,0,1,0,0,0,0,1,0,1,1,0,1];gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(e),gl.STATIC_DRAW),cubeVertexTextureCoordBuffer.itemSize=2,cubeVertexTextureCoordBuffer.numItems=24,cubeVertexIndexBuffer=gl.createBuffer(),gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,cubeVertexIndexBuffer);var t=[0,1,2,0,2,3,4,5,6,4,6,7,8,9,10,8,10,11,12,13,14,12,14,15,16,17,18,16,18,19,20,21,22,20,22,23];gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(t),gl.STATIC_DRAW),cubeVertexIndexBuffer.itemSize=1,cubeVertexIndexBuffer.numItems=36}function handleLoadedTexture(r){gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,!0),gl.bindTexture(gl.TEXTURE_2D,r),gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,r.image),gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR),gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST),gl.generateMipmap(gl.TEXTURE_2D),gl.bindTexture(gl.TEXTURE_2D,null)}function initTextures(){crateTexture=gl.createTexture(),crateTexture.image=new Image,crateTexture.image.onload=function(){handleLoadedTexture(crateTexture)},crateTexture.image.src=GROUND_TEXTURE_ENCODING}function setMatrixUniforms(){gl.uniformMatrix4fv(shaderProgram.pMatrixUniform,!1,pMatrix),gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform,!1,mvMatrix);var r=mat3.create();mat4.toInverseMat3(mvMatrix,r),mat3.transpose(r),gl.uniformMatrix3fv(shaderProgram.nMatrixUniform,!1,r)}function degToRad(r){return r*Math.PI/180}function drawScene(){gl.viewport(0,0,gl.viewportWidth,gl.viewportHeight),gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT),mat4.perspective(45,gl.viewportWidth/gl.viewportHeight,.1,100,pMatrix),mat4.identity(mvMatrix),mat4.translate(mvMatrix,[0,0,-5]);mat4.rotate(mvMatrix,degToRad(0),[1,0,0]),mat4.rotate(mvMatrix,degToRad(0),[0,1,0]),gl.bindBuffer(gl.ARRAY_BUFFER,cubeVertexPositionBuffer),gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,cubeVertexPositionBuffer.itemSize,gl.FLOAT,!1,0,0),gl.bindBuffer(gl.ARRAY_BUFFER,cubeVertexNormalBuffer),gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute,cubeVertexNormalBuffer.itemSize,gl.FLOAT,!1,0,0),gl.bindBuffer(gl.ARRAY_BUFFER,cubeVertexTextureCoordBuffer),gl.vertexAttribPointer(shaderProgram.textureCoordAttribute,cubeVertexTextureCoordBuffer.itemSize,gl.FLOAT,!1,0,0),gl.activeTexture(gl.TEXTURE0),gl.bindTexture(gl.TEXTURE_2D,crateTexture),gl.uniform1i(shaderProgram.samplerUniform,0);gl.uniform1i(shaderProgram.useLightingUniform,!0),gl.uniform3f(shaderProgram.ambientColorUniform,AMBIENT_LIGHT_COLOR,AMBIENT_LIGHT_COLOR,AMBIENT_LIGHT_COLOR);var r=[DIRECTIONAL_LIGHT_X,DIRECTIONAL_LIGHT_Y,DIRECTIONAL_LIGHT_Z],e=vec3.create();vec3.normalize(r,e),vec3.scale(e,-1),gl.uniform3fv(shaderProgram.lightingDirectionUniform,e),gl.uniform3f(shaderProgram.directionalColorUniform,DIRECTIONAL_LIGHT_COLOR,DIRECTIONAL_LIGHT_COLOR,DIRECTIONAL_LIGHT_COLOR),gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,cubeVertexIndexBuffer),setMatrixUniforms(),gl.drawElements(gl.TRIANGLES,cubeVertexIndexBuffer.numItems,gl.UNSIGNED_SHORT,0)}function update(){var r=(new Date).getTime();lastTime=r,drawScene(),requestAnimationFrame(update)}function init(){var r=document.getElementById("sceneCanvas");r.width=window.innerWidth,r.height=window.innerHeight,document.body.appendChild(r),gl=r.getContext("webgl"),gl.viewportWidth=r.width,gl.viewportHeight=r.height,initShaders(),initBuffers(),initTextures(),gl.clearColor(0,0,0,1),gl.enable(gl.DEPTH_TEST),update()}glMatrixArrayType="undefined"!=typeof Float32Array?Float32Array:"undefined"!=typeof WebGLFloatArray?WebGLFloatArray:Array;var vec3={};vec3.create=function(r){var e=new glMatrixArrayType(3);return r&&(e[0]=r[0],e[1]=r[1],e[2]=r[2]),e},vec3.scale=function(r,e,t){return t&&r!=t?(t[0]=r[0]*e,t[1]=r[1]*e,t[2]=r[2]*e,t):(r[0]*=e,r[1]*=e,r[2]*=e,r)},vec3.normalize=function(r,e){e||(e=r);var t=r[0],a=r[1],i=r[2],o=Math.sqrt(t*t+a*a+i*i);return o?1==o?(e[0]=t,e[1]=a,e[2]=i,e):(o=1/o,e[0]=t*o,e[1]=a*o,e[2]=i*o,e):(e[0]=0,e[1]=0,e[2]=0,e)};var mat3={};mat3.create=function(r){var e=new glMatrixArrayType(9);return r&&(e[0]=r[0],e[1]=r[1],e[2]=r[2],e[3]=r[3],e[4]=r[4],e[5]=r[5],e[6]=r[6],e[7]=r[7],e[8]=r[8],e[9]=r[9]),e},mat3.transpose=function(r,e){if(!e||r==e){var t=r[1],a=r[2],i=r[5];return r[1]=r[3],r[2]=r[6],r[3]=t,r[5]=r[7],r[6]=a,r[7]=i,r}return e[0]=r[0],e[1]=r[3],e[2]=r[6],e[3]=r[1],e[4]=r[4],e[5]=r[7],e[6]=r[2],e[7]=r[5],e[8]=r[8],e};var mat4={};mat4.create=function(r){var e=new glMatrixArrayType(16);return r&&(e[0]=r[0],e[1]=r[1],e[2]=r[2],e[3]=r[3],e[4]=r[4],e[5]=r[5],e[6]=r[6],e[7]=r[7],e[8]=r[8],e[9]=r[9],e[10]=r[10],e[11]=r[11],e[12]=r[12],e[13]=r[13],e[14]=r[14],e[15]=r[15]),e},mat4.identity=function(r){return r[0]=1,r[1]=0,r[2]=0,r[3]=0,r[4]=0,r[5]=1,r[6]=0,r[7]=0,r[8]=0,r[9]=0,r[10]=1,r[11]=0,r[12]=0,r[13]=0,r[14]=0,r[15]=1,r},mat4.toInverseMat3=function(r,e){var t=r[0],a=r[1],i=r[2],o=r[4],n=r[5],g=r[6],u=r[8],l=r[9],m=r[10],f=m*n-g*l,d=-m*o+g*u,c=l*o-n*u,T=t*f+a*d+i*c;return T?(T=1/T,e||(e=mat3.create()),e[0]=f*T,e[1]=(-m*a+i*l)*T,e[2]=(g*a-i*n)*T,e[3]=d*T,e[4]=(m*t-i*u)*T,e[5]=(-g*t+i*o)*T,e[6]=c*T,e[7]=(-l*t+a*u)*T,e[8]=(n*t-a*o)*T,e):null},mat4.multiply=function(r,e,t){t||(t=r);var a=r[0],i=r[1],o=r[2],n=r[3],g=r[4],u=r[5],l=r[6],m=r[7],f=r[8],d=r[9],c=r[10],T=r[11],x=r[12],s=r[13],A=r[14];r=r[15];var h=e[0],R=e[1],E=e[2],I=e[3],v=e[4],_=e[5],P=e[6],b=e[7],B=e[8],L=e[9],U=e[10],M=e[11],C=e[12],N=e[13],F=e[14];return e=e[15],t[0]=h*a+R*g+E*f+I*x,t[1]=h*i+R*u+E*d+I*s,t[2]=h*o+R*l+E*c+I*A,t[3]=h*n+R*m+E*T+I*r,t[4]=v*a+_*g+P*f+b*x,t[5]=v*i+_*u+P*d+b*s,t[6]=v*o+_*l+P*c+b*A,t[7]=v*n+_*m+P*T+b*r,t[8]=B*a+L*g+U*f+M*x,t[9]=B*i+L*u+U*d+M*s,t[10]=B*o+L*l+U*c+M*A,t[11]=B*n+L*m+U*T+M*r,t[12]=C*a+N*g+F*f+e*x,t[13]=C*i+N*u+F*d+e*s,t[14]=C*o+N*l+F*c+e*A,t[15]=C*n+N*m+F*T+e*r,t},mat4.translate=function(r,e,t){var a=e[0],i=e[1];if(e=e[2],!t||r==t)return r[12]=r[0]*a+r[4]*i+r[8]*e+r[12],r[13]=r[1]*a+r[5]*i+r[9]*e+r[13],r[14]=r[2]*a+r[6]*i+r[10]*e+r[14],r[15]=r[3]*a+r[7]*i+r[11]*e+r[15],r;var o=r[0],n=r[1],g=r[2],u=r[3],l=r[4],m=r[5],f=r[6],d=r[7],c=r[8],T=r[9],x=r[10],s=r[11];return t[0]=o,t[1]=n,t[2]=g,t[3]=u,t[4]=l,t[5]=m,t[6]=f,t[7]=d,t[8]=c,t[9]=T,t[10]=x,t[11]=s,t[12]=o*a+l*i+c*e+r[12],t[13]=n*a+m*i+T*e+r[13],t[14]=g*a+f*i+x*e+r[14],t[15]=u*a+d*i+s*e+r[15],t},mat4.scale=function(r,e,t){var a=e[0],i=e[1];return e=e[2],t&&r!=t?(t[0]=r[0]*a,t[1]=r[1]*a,t[2]=r[2]*a,t[3]=r[3]*a,t[4]=r[4]*i,t[5]=r[5]*i,t[6]=r[6]*i,t[7]=r[7]*i,t[8]=r[8]*e,t[9]=r[9]*e,t[10]=r[10]*e,t[11]=r[11]*e,t[12]=r[12],t[13]=r[13],t[14]=r[14],t[15]=r[15],t):(r[0]*=a,r[1]*=a,r[2]*=a,r[3]*=a,r[4]*=i,r[5]*=i,r[6]*=i,r[7]*=i,r[8]*=e,r[9]*=e,r[10]*=e,r[11]*=e,r)},mat4.rotate=function(r,e,t,a){var i=t[0],o=t[1];t=t[2];var n=Math.sqrt(i*i+o*o+t*t);if(!n)return null;1!=n&&(n=1/n,i*=n,o*=n,t*=n);var g=Math.sin(e),u=Math.cos(e),l=1-u;e=r[0],n=r[1];var m=r[2],f=r[3],d=r[4],c=r[5],T=r[6],x=r[7],s=r[8],A=r[9],h=r[10],R=r[11],E=i*i*l+u,I=o*i*l+t*g,v=t*i*l-o*g,_=i*o*l-t*g,P=o*o*l+u,b=t*o*l+i*g,B=i*t*l+o*g;return i=o*t*l-i*g,o=t*t*l+u,a?r!=a&&(a[12]=r[12],a[13]=r[13],a[14]=r[14],a[15]=r[15]):a=r,a[0]=e*E+d*I+s*v,a[1]=n*E+c*I+A*v,a[2]=m*E+T*I+h*v,a[3]=f*E+x*I+R*v,a[4]=e*_+d*P+s*b,a[5]=n*_+c*P+A*b,a[6]=m*_+T*P+h*b,a[7]=f*_+x*P+R*b,a[8]=e*B+d*i+s*o,a[9]=n*B+c*i+A*o,a[10]=m*B+T*i+h*o,a[11]=f*B+x*i+R*o,a},mat4.frustum=function(r,e,t,a,i,o,n){n||(n=mat4.create());var g=e-r,u=a-t,l=o-i;return n[0]=2*i/g,n[1]=0,n[2]=0,n[3]=0,n[4]=0,n[5]=2*i/u,n[6]=0,n[7]=0,n[8]=(e+r)/g,n[9]=(a+t)/u,n[10]=-(o+i)/l,n[11]=-1,n[12]=0,n[13]=0,n[14]=-o*i*2/l,n[15]=0,n},mat4.perspective=function(r,e,t,a,i){return r=t*Math.tan(r*Math.PI/360),e*=r,mat4.frustum(-e,e,-r,r,t,a,i)};var shaderProgram,cubeVertexPositionBuffer,cubeVertexNormalBuffer,cubeVertexTextureCoordBuffer,cubeVertexIndexBuffer,crateTexture,DIRECTIONAL_LIGHT_X=-.25,DIRECTIONAL_LIGHT_Y=-.25,DIRECTIONAL_LIGHT_Z=-1,DIRECTIONAL_LIGHT_COLOR=.8,AMBIENT_LIGHT_COLOR=.2,gl,lastTime=0,mvMatrix=mat4.create(),pMatrix=mat4.create();init();</script>
+    <script>// glMatrix v0.9.5
+glMatrixArrayType=typeof Float32Array!="undefined"?Float32Array:typeof WebGLFloatArray!="undefined"?WebGLFloatArray:Array;
+var vec3={};
+vec3.create=function(a){var b=new glMatrixArrayType(3);if(a){b[0]=a[0];b[1]=a[1];b[2]=a[2]}return b};
+vec3.scale=function(a,b,c){if(!c||a==c){a[0]*=b;a[1]*=b;a[2]*=b;return a}c[0]=a[0]*b;c[1]=a[1]*b;c[2]=a[2]*b;return c};
+vec3.normalize=function(a,b){b||(b=a);var c=a[0],d=a[1],e=a[2],g=Math.sqrt(c*c+d*d+e*e);if(g){if(g==1){b[0]=c;b[1]=d;b[2]=e;return b}}else{b[0]=0;b[1]=0;b[2]=0;return b}g=1/g;b[0]=c*g;b[1]=d*g;b[2]=e*g;return b};
+var mat3={};
+mat3.create=function(a){var b=new glMatrixArrayType(9);if(a){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9]}return b};
+mat3.transpose=function(a,b){if(!b||a==b){var c=a[1],d=a[2],e=a[5];a[1]=a[3];a[2]=a[6];a[3]=c;a[5]=a[7];a[6]=d;a[7]=e;return a}b[0]=a[0];b[1]=a[3];b[2]=a[6];b[3]=a[1];b[4]=a[4];b[5]=a[7];b[6]=a[2];b[7]=a[5];b[8]=a[8];return b};
+var mat4={};
+mat4.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=a[12];b[13]=a[13];b[14]=a[14];b[15]=a[15];return b};mat4.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=0;a[5]=1;a[6]=0;a[7]=0;a[8]=0;a[9]=0;a[10]=1;a[11]=0;a[12]=0;a[13]=0;a[14]=0;a[15]=1;return a};
+mat4.create=function(a){var b=new glMatrixArrayType(16);if(a){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=a[12];b[13]=a[13];b[14]=a[14];b[15]=a[15]}return b};
+mat4.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=0;a[5]=1;a[6]=0;a[7]=0;a[8]=0;a[9]=0;a[10]=1;a[11]=0;a[12]=0;a[13]=0;a[14]=0;a[15]=1;return a};
+mat4.toInverseMat3=function(a,b){var c=a[0],d=a[1],e=a[2],g=a[4],f=a[5],h=a[6],i=a[8],j=a[9],k=a[10],l=k*f-h*j,o=-k*g+h*i,m=j*g-f*i,n=c*l+d*o+e*m;if(!n)return null;n=1/n;b||(b=mat3.create());b[0]=l*n;b[1]=(-k*d+e*j)*n;b[2]=(h*d-e*f)*n;b[3]=o*n;b[4]=(k*c-e*i)*n;b[5]=(-h*c+e*g)*n;b[6]=m*n;b[7]=(-j*c+d*i)*n;b[8]=(f*c-d*g)*n;return b};
+mat4.multiply=function(a,b,c){c||(c=a);var d=a[0],e=a[1],g=a[2],f=a[3],h=a[4],i=a[5],j=a[6],k=a[7],l=a[8],o=a[9],m=a[10],n=a[11],p=a[12],r=a[13],s=a[14];a=a[15];var A=b[0],B=b[1],t=b[2],u=b[3],v=b[4],w=b[5],x=b[6],y=b[7],z=b[8],C=b[9],D=b[10],E=b[11],q=b[12],F=b[13],G=b[14];b=b[15];c[0]=A*d+B*h+t*l+u*p;c[1]=A*e+B*i+t*o+u*r;c[2]=A*g+B*j+t*m+u*s;c[3]=A*f+B*k+t*n+u*a;c[4]=v*d+w*h+x*l+y*p;c[5]=v*e+w*i+x*o+y*r;c[6]=v*g+w*j+x*m+y*s;c[7]=v*f+w*k+x*n+y*a;c[8]=z*d+C*h+D*l+E*p;c[9]=z*e+C*i+D*o+E*r;c[10]=z*
+g+C*j+D*m+E*s;c[11]=z*f+C*k+D*n+E*a;c[12]=q*d+F*h+G*l+b*p;c[13]=q*e+F*i+G*o+b*r;c[14]=q*g+F*j+G*m+b*s;c[15]=q*f+F*k+G*n+b*a;return c};
+mat4.translate=function(a,b,c){var d=b[0],e=b[1];b=b[2];if(!c||a==c){a[12]=a[0]*d+a[4]*e+a[8]*b+a[12];a[13]=a[1]*d+a[5]*e+a[9]*b+a[13];a[14]=a[2]*d+a[6]*e+a[10]*b+a[14];a[15]=a[3]*d+a[7]*e+a[11]*b+a[15];return a}var g=a[0],f=a[1],h=a[2],i=a[3],j=a[4],k=a[5],l=a[6],o=a[7],m=a[8],n=a[9],p=a[10],r=a[11];c[0]=g;c[1]=f;c[2]=h;c[3]=i;c[4]=j;c[5]=k;c[6]=l;c[7]=o;c[8]=m;c[9]=n;c[10]=p;c[11]=r;c[12]=g*d+j*e+m*b+a[12];c[13]=f*d+k*e+n*b+a[13];c[14]=h*d+l*e+p*b+a[14];c[15]=i*d+o*e+r*b+a[15];return c};
+mat4.scale=function(a,b,c){var d=b[0],e=b[1];b=b[2];if(!c||a==c){a[0]*=d;a[1]*=d;a[2]*=d;a[3]*=d;a[4]*=e;a[5]*=e;a[6]*=e;a[7]*=e;a[8]*=b;a[9]*=b;a[10]*=b;a[11]*=b;return a}c[0]=a[0]*d;c[1]=a[1]*d;c[2]=a[2]*d;c[3]=a[3]*d;c[4]=a[4]*e;c[5]=a[5]*e;c[6]=a[6]*e;c[7]=a[7]*e;c[8]=a[8]*b;c[9]=a[9]*b;c[10]=a[10]*b;c[11]=a[11]*b;c[12]=a[12];c[13]=a[13];c[14]=a[14];c[15]=a[15];return c};
+mat4.rotate=function(a,b,c,d){var e=c[0],g=c[1];c=c[2];var f=Math.sqrt(e*e+g*g+c*c);if(!f)return null;if(f!=1){f=1/f;e*=f;g*=f;c*=f}var h=Math.sin(b),i=Math.cos(b),j=1-i;b=a[0];f=a[1];var k=a[2],l=a[3],o=a[4],m=a[5],n=a[6],p=a[7],r=a[8],s=a[9],A=a[10],B=a[11],t=e*e*j+i,u=g*e*j+c*h,v=c*e*j-g*h,w=e*g*j-c*h,x=g*g*j+i,y=c*g*j+e*h,z=e*c*j+g*h;e=g*c*j-e*h;g=c*c*j+i;if(d){if(a!=d){d[12]=a[12];d[13]=a[13];d[14]=a[14];d[15]=a[15]}}else d=a;d[0]=b*t+o*u+r*v;d[1]=f*t+m*u+s*v;d[2]=k*t+n*u+A*v;d[3]=l*t+p*u+B*
+v;d[4]=b*w+o*x+r*y;d[5]=f*w+m*x+s*y;d[6]=k*w+n*x+A*y;d[7]=l*w+p*x+B*y;d[8]=b*z+o*e+r*g;d[9]=f*z+m*e+s*g;d[10]=k*z+n*e+A*g;d[11]=l*z+p*e+B*g;return d};
+mat4.frustum=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;f[0]=e*2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=e*2/i;f[6]=0;f[7]=0;f[8]=(b+a)/h;f[9]=(d+c)/i;f[10]=-(g+e)/j;f[11]=-1;f[12]=0;f[13]=0;f[14]=-(g*e*2)/j;f[15]=0;return f};
+mat4.perspective=function(a,b,c,d,e){a=c*Math.tan(a*Math.PI/360);b=a*b;return mat4.frustum(-b,b,-a,a,c,d,e)};
+
+var WebGL = function(canvasId){
+    this.canvas = document.getElementById(canvasId);
+    this.context = this.canvas.getContext("experimental-webgl");
+    this.stage = undefined;
+
+    // Animation 
+    this.t = 0;
+    this.timeInterval = 0;
+    this.startTime = 0;
+    this.lastTime = 0;
+    this.frame = 0;
+    this.animating = false;
+    
+    // provided by Paul Irish
+    window.requestAnimFrame = (function(callback){
+        return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function(callback){
+            window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+    
+  /*
+   * encapsulte mat3, mat4, and vec3 from
+   * glMatrix globals
+   */
+    this.mat3 = mat3;
+    this.mat4 = mat4;
+  this.vec3 = vec3;
+    
+    // shader type constants
+    this.BLUE_COLOR = "BLUE_COLOR";
+    this.VARYING_COLOR = "VARYING_COLOR";
+    this.TEXTURE = "TEXTURE";
+    this.TEXTURE_DIRECTIONAL_LIGHTING = "TEXTURE_DIRECTIONAL_LIGHTING";
+    
+    this.shaderProgram = null;
+    this.mvMatrix = this.mat4.create();
+    this.pMatrix = this.mat4.create();
+    this.mvMatrixStack = [];
+    this.context.viewportWidth = this.canvas.width;
+    this.context.viewportHeight = this.canvas.height;
+    
+    // init depth test
+    this.context.enable(this.context.DEPTH_TEST);
+};
+
+// ======================================= GENERAL =======================================
+
+WebGL.prototype.getContext = function(){
+    return this.context;
+};
+
+WebGL.prototype.getCanvas = function(){
+    return this.canvas;
+};
+
+WebGL.prototype.clear = function(){
+    this.context.viewport(0, 0, this.context.viewportWidth, this.context.viewportHeight);
+    this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
+};
+
+WebGL.prototype.setStage = function(func){
+    this.stage = func;
+};
+
+// ======================================= ANIMATION =======================================
+
+WebGL.prototype.isAnimating = function(){
+    return this.animating;
+};
+WebGL.prototype.getFrame = function(){
+    return this.frame;
+};
+WebGL.prototype.startAnimation = function(){
+    this.animating = true;
+    var date = new Date();
+    this.startTime = date.getTime();
+    this.lastTime = this.startTime;
+    
+    if (this.stage !== undefined) {
+        this.stage();
+    }
+    
+    this.animationLoop();
+};
+WebGL.prototype.stopAnimation = function(){
+    this.animating = false;
+};
+WebGL.prototype.getTimeInterval = function(){
+    return this.timeInterval;
+};
+WebGL.prototype.getTime = function(){
+    return this.t;
+};
+WebGL.prototype.getFps = function(){
+    return this.timeInterval > 0 ? 1000 / this.timeInterval : 0;
+};
+WebGL.prototype.animationLoop = function(){
+    var that = this;
+    
+    this.frame++;
+    var date = new Date();
+    var thisTime = date.getTime();
+    this.timeInterval = thisTime - this.lastTime;
+    this.t += this.timeInterval;
+    this.lastTime = thisTime;
+    
+    if (this.stage !== undefined) {
+        this.stage();
+    }
+    
+    if (this.animating) {
+        requestAnimFrame(function(){
+            that.animationLoop();
+        });
+    }
+};
+
+// ======================================= WEBGL WRAPPER =======================================
+
+WebGL.prototype.save = function(){
+    var copy = this.mat4.create();
+    this.mat4.set(this.mvMatrix, copy);
+    this.mvMatrixStack.push(copy);
+};
+
+WebGL.prototype.restore = function(){
+    if (this.mvMatrixStack.length == 0) {
+        throw "Invalid popMatrix!";
+    }
+    this.mvMatrix = this.mvMatrixStack.pop();
+};
+
+WebGL.prototype.getFragmentShaderGLSL = function(shaderType){
+    switch (shaderType) {
+        case this.BLUE_COLOR:
+            return "#ifdef GL_ES\n" +
+            "precision highp float;\n" +
+            "#endif\n" +
+            "void main(void) {\n" +
+            "gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\n" +
+            "}";
+        case this.VARYING_COLOR:
+            return "#ifdef GL_ES\n" +
+            "precision highp float;\n" +
+            "#endif\n" +
+            "varying vec4 vColor;\n" +
+            "void main(void) {\n" +
+            "gl_FragColor = vColor;\n" +
+            "}";
+        case this.TEXTURE:
+            return "#ifdef GL_ES\n" +
+            "precision highp float;\n" +
+            "#endif\n" +
+            "varying vec2 vTextureCoord;\n" +
+            "uniform sampler2D uSampler;\n" +
+            "void main(void) {\n" +
+            "gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n" +
+            "}";
+        case this.TEXTURE_DIRECTIONAL_LIGHTING:
+            return "#ifdef GL_ES\n" +
+            "precision highp float;\n" +
+            "#endif\n" +
+            "varying vec2 vTextureCoord;\n" +
+            "varying vec3 vLightWeighting;\n" +
+            "uniform sampler2D uSampler;\n" +
+            "void main(void) {\n" +
+            "vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n" +
+            "gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n" +
+            "}";
+    }
+};
+
+WebGL.prototype.getVertexShaderGLSL = function(shaderType){
+    switch (shaderType) {
+        case this.BLUE_COLOR:
+            return "attribute vec3 aVertexPosition;\n" +
+            "uniform mat4 uMVMatrix;\n" +
+            "uniform mat4 uPMatrix;\n" +
+            "void main(void) {\n" +
+            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
+            "}";
+        case this.VARYING_COLOR:
+            return "attribute vec3 aVertexPosition;\n" +
+            "attribute vec4 aVertexColor;\n" +
+            "uniform mat4 uMVMatrix;\n" +
+            "uniform mat4 uPMatrix;\n" +
+            "varying vec4 vColor;\n" +
+            "void main(void) {\n" +
+            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
+            "vColor = aVertexColor;\n" +
+            "}";
+        case this.TEXTURE:
+            return "attribute vec3 aVertexPosition;\n" +
+            "attribute vec2 aTextureCoord;\n" +
+            "uniform mat4 uMVMatrix;\n" +
+            "uniform mat4 uPMatrix;\n" +
+            "varying vec2 vTextureCoord;\n" +
+            "void main(void) {\n" +
+            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
+            "vTextureCoord = aTextureCoord;\n" +
+            "}";
+        case this.TEXTURE_DIRECTIONAL_LIGHTING:
+            return "attribute vec3 aVertexPosition;\n" +
+            "attribute vec3 aVertexNormal;\n" +
+            "attribute vec2 aTextureCoord;\n" +
+            "uniform mat4 uMVMatrix;\n" +
+            "uniform mat4 uPMatrix;\n" +
+            "uniform mat3 uNMatrix;\n" +
+            "uniform vec3 uAmbientColor;\n" +
+            "uniform vec3 uLightingDirection;\n" +
+            "uniform vec3 uDirectionalColor;\n" +
+            "uniform bool uUseLighting;\n" +
+            "varying vec2 vTextureCoord;\n" +
+            "varying vec3 vLightWeighting;\n" +
+            "void main(void) {\n" +
+            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
+            "vTextureCoord = aTextureCoord;\n" +
+            "if (!uUseLighting) {\n" +
+            "vLightWeighting = vec3(1.0, 1.0, 1.0);\n" +
+            "} else {\n" +
+            "vec3 transformedNormal = uNMatrix * aVertexNormal;\n" +
+            "float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n" +
+            "vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;\n" +
+            "}\n" +
+            "}";
+    }
+};
+
+WebGL.prototype.initShaders = function(shaderType){
+    this.initPositionShader();
+    
+    switch (shaderType) {
+        case this.VARYING_COLOR:
+            this.initColorShader();
+            break;
+        case this.TEXTURE:
+            this.initTextureShader();
+            break;
+        case this.TEXTURE_DIRECTIONAL_LIGHTING:
+            this.initTextureShader();
+            this.initNormalShader();
+            this.initLightingShader();
+            break;
+    }
+};
+
+WebGL.prototype.setShaderProgram = function(shaderType){
+    var fragmentGLSL = this.getFragmentShaderGLSL(shaderType);
+    var vertexGLSL = this.getVertexShaderGLSL(shaderType);
+    
+    var fragmentShader = this.context.createShader(this.context.FRAGMENT_SHADER);
+    this.context.shaderSource(fragmentShader, fragmentGLSL);
+    this.context.compileShader(fragmentShader);
+    
+    var vertexShader = this.context.createShader(this.context.VERTEX_SHADER);
+    this.context.shaderSource(vertexShader, vertexGLSL);
+    this.context.compileShader(vertexShader);
+    
+    this.shaderProgram = this.context.createProgram();
+    this.context.attachShader(this.shaderProgram, vertexShader);
+    this.context.attachShader(this.shaderProgram, fragmentShader);
+    this.context.linkProgram(this.shaderProgram);
+    
+    if (!this.context.getProgramParameter(this.shaderProgram, this.context.LINK_STATUS)) {
+        alert("Could not initialize shaders");
+    }
+    
+    this.context.useProgram(this.shaderProgram);
+    
+    // once shader program is loaded, it's time to init the shaders
+    this.initShaders(shaderType);
+};
+
+WebGL.prototype.perspective = function(viewAngle, minDist, maxDist){
+    this.mat4.perspective(viewAngle, this.context.viewportWidth / this.context.viewportHeight, minDist, maxDist, this.pMatrix);
+};
+
+WebGL.prototype.identity = function(){
+    this.mat4.identity(this.mvMatrix);
+};
+
+WebGL.prototype.translate = function(x, y, z){
+    this.mat4.translate(this.mvMatrix, [x, y, z]);
+};
+
+WebGL.prototype.rotate = function(angle, x, y, z){
+    this.mat4.rotate(this.mvMatrix, angle, [x, y, z]);
+};
+
+WebGL.prototype.initPositionShader = function(){
+    this.shaderProgram.vertexPositionAttribute = this.context.getAttribLocation(this.shaderProgram, "aVertexPosition");
+    this.context.enableVertexAttribArray(this.shaderProgram.vertexPositionAttribute);
+    this.shaderProgram.pMatrixUniform = this.context.getUniformLocation(this.shaderProgram, "uPMatrix");
+    this.shaderProgram.mvMatrixUniform = this.context.getUniformLocation(this.shaderProgram, "uMVMatrix");
+};
+
+WebGL.prototype.initColorShader = function(){
+    this.shaderProgram.vertexColorAttribute = this.context.getAttribLocation(this.shaderProgram, "aVertexColor");
+    this.context.enableVertexAttribArray(this.shaderProgram.vertexColorAttribute);
+};
+
+WebGL.prototype.initTextureShader = function(){
+    this.shaderProgram.textureCoordAttribute = this.context.getAttribLocation(this.shaderProgram, "aTextureCoord");
+    this.context.enableVertexAttribArray(this.shaderProgram.textureCoordAttribute);
+    this.shaderProgram.samplerUniform = this.context.getUniformLocation(this.shaderProgram, "uSampler");
+};
+
+WebGL.prototype.initNormalShader = function(){
+    this.shaderProgram.vertexNormalAttribute = this.context.getAttribLocation(this.shaderProgram, "aVertexNormal");
+    this.context.enableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);
+    this.shaderProgram.nMatrixUniform = this.context.getUniformLocation(this.shaderProgram, "uNMatrix");
+};
+
+WebGL.prototype.initLightingShader = function(){
+    this.shaderProgram.useLightingUniform = this.context.getUniformLocation(this.shaderProgram, "uUseLighting");
+    this.shaderProgram.ambientColorUniform = this.context.getUniformLocation(this.shaderProgram, "uAmbientColor");
+    this.shaderProgram.lightingDirectionUniform = this.context.getUniformLocation(this.shaderProgram, "uLightingDirection");
+    this.shaderProgram.directionalColorUniform = this.context.getUniformLocation(this.shaderProgram, "uDirectionalColor");
+};
+
+WebGL.prototype.initTexture = function(texture){
+    this.context.pixelStorei(this.context.UNPACK_FLIP_Y_WEBGL, true);
+    this.context.bindTexture(this.context.TEXTURE_2D, texture);
+    this.context.texImage2D(this.context.TEXTURE_2D, 0, this.context.RGBA, this.context.RGBA, this.context.UNSIGNED_BYTE, texture.image);
+    this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MAG_FILTER, this.context.NEAREST);
+    this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MIN_FILTER, this.context.LINEAR_MIPMAP_NEAREST);
+    this.context.generateMipmap(this.context.TEXTURE_2D);
+    this.context.bindTexture(this.context.TEXTURE_2D, null);
+};
+
+WebGL.prototype.createArrayBuffer = function(vertices){
+    var buffer = this.context.createBuffer();
+    buffer.numElements = vertices.length;
+    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffer);
+    this.context.bufferData(this.context.ARRAY_BUFFER, new Float32Array(vertices), this.context.STATIC_DRAW);
+    return buffer;
+};
+
+WebGL.prototype.createElementArrayBuffer = function(vertices){
+    var buffer = this.context.createBuffer();
+    buffer.numElements = vertices.length;
+    this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, buffer);
+    this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices), this.context.STATIC_DRAW);
+    return buffer;
+};
+
+WebGL.prototype.pushPositionBuffer = function(buffers){
+    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.positionBuffer);
+    this.context.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, 3, this.context.FLOAT, false, 0, 0);
+};
+
+
+WebGL.prototype.pushColorBuffer = function(buffers){
+    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.colorBuffer);
+    this.context.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, 4, this.context.FLOAT, false, 0, 0);
+};
+
+WebGL.prototype.pushTextureBuffer = function(buffers, texture){
+    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.textureBuffer);
+    this.context.vertexAttribPointer(this.shaderProgram.textureCoordAttribute, 2, this.context.FLOAT, false, 0, 0);
+    this.context.activeTexture(this.context.TEXTURE0);
+    this.context.bindTexture(this.context.TEXTURE_2D, texture);
+    this.context.uniform1i(this.shaderProgram.samplerUniform, 0);
+};
+
+WebGL.prototype.pushIndexBuffer = function(buffers){
+    this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
+};
+
+WebGL.prototype.pushNormalBuffer = function(buffers){
+    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.normalBuffer);
+    this.context.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.context.FLOAT, false, 0, 0);
+};
+
+WebGL.prototype.setMatrixUniforms = function(){
+    this.context.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
+    this.context.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, this.mvMatrix);
+    
+    var normalMatrix = this.mat3.create();
+    this.mat4.toInverseMat3(this.mvMatrix, normalMatrix);
+    this.mat3.transpose(normalMatrix);
+    this.context.uniformMatrix3fv(this.shaderProgram.nMatrixUniform, false, normalMatrix);
+};
+
+WebGL.prototype.drawElements = function(buffers){
+    this.setMatrixUniforms();
+    
+    // draw elements
+    this.context.drawElements(this.context.TRIANGLES, buffers.indexBuffer.numElements, this.context.UNSIGNED_SHORT, 0);
+};
+
+WebGL.prototype.drawArrays = function(buffers){
+    this.setMatrixUniforms();
+    
+    // draw arrays
+    this.context.drawArrays(this.context.TRIANGLES, 0, buffers.positionBuffer.numElements / 3);
+};
+
+WebGL.prototype.enableLighting = function(){
+    this.context.uniform1i(this.shaderProgram.useLightingUniform, true);
+};
+
+WebGL.prototype.setAmbientLighting = function(red, green, blue){
+    this.context.uniform3f(this.shaderProgram.ambientColorUniform, parseFloat(red), parseFloat(green), parseFloat(blue));
+};
+
+WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
+    // directional lighting
+    var lightingDirection = [x, y, z];
+    var adjustedLD = this.vec3.create();
+    this.vec3.normalize(lightingDirection, adjustedLD);
+    this.vec3.scale(adjustedLD, -1);
+    this.context.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
+    
+    // directional color
+    this.context.uniform3f(this.shaderProgram.directionalColorUniform, parseFloat(red), parseFloat(green), parseFloat(blue));
+};
+            /*************************************
+             * Controller
+             */
+            function Controller(){
+                this.view = new View(this);
+                this.gl = new WebGL("myCanvas");
+                this.gl.setShaderProgram("TEXTURE_DIRECTIONAL_LIGHTING");
+                this.model = new Model(this);
+                
+                this.attachListeners();
+                
+                var sources = {
+                    crate: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==',
+                    metalFloor: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==',
+                    metalWall: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==',
+                    ceiling: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw=='
+                };
+                
+                this.mouseDownPos = null;
+                this.mouseDownPitch = 0;
+                this.mouseDownYaw = 0;
+                
+                var that = this;
+                this.loadTextures(sources, function(){
+                    that.gl.setStage(function(){
+                        that.view.stage();
+                    });
+                    
+                    that.gl.startAnimation();
+                });
+            }
+            
+            Controller.prototype.loadTextures = function(sources, callback){
+                var gl = this.gl;
+                var context = gl.getContext();
+                var textures = this.model.textures;
+                var loadedImages = 0;
+                var numImages = 0;
+                for (var src in sources) {
+                    // anonymous function to induce scope
+                    (function(){
+                        var key = src;
+                        numImages++;
+                        textures[key] = context.createTexture();
+                        textures[key].image = new Image();
+                        textures[key].image.onload = function(){
+                            gl.initTexture(textures[key]);
+                            if (++loadedImages >= numImages) {
+                                callback();
+                            }
+                        };
+                        
+                        textures[key].image.src = sources[key];
+                    })();
+                }
+            };
+            
+            Controller.prototype.getMousePos = function(evt){
+                return {
+                    x: evt.clientX,
+                    y: evt.clientY
+                };
+            };
+            
+            Controller.prototype.handleMouseDown = function(evt){
+                var camera = this.model.camera;
+                this.mouseDownPos = this.getMousePos(evt);
+                this.mouseDownPitch = camera.pitch;
+                this.mouseDownYaw = camera.yaw;
+            };
+            
+            Controller.prototype.handleMouseMove = function(evt){
+                var mouseDownPos = this.mouseDownPos;
+                var gl = this.gl;
+                if (mouseDownPos !== null) {
+                    var mousePos = this.getMousePos(evt);
+                    
+                    // update pitch
+                    var yDiff = mousePos.y - mouseDownPos.y;
+                    this.model.camera.pitch = this.mouseDownPitch + yDiff / gl.getCanvas().height;
+                    
+                    // update yaw
+                    var xDiff = mousePos.x - mouseDownPos.x;
+                    this.model.camera.yaw = this.mouseDownYaw + xDiff / gl.getCanvas().width;
+                }
+            };
+            
+            Controller.prototype.handleKeyDown = function(evt){
+                var keycode = ((evt.which) || (evt.keyCode));
+                var model = this.model;
+                switch (keycode) {
+                    case 37:
+                        // left key
+                        model.sideMovement = model.LEFT;
+                        break;
+                    case 38:
+                        // up key
+                        model.straightMovement = model.FORWARD;
+                        break;
+                    case 39:
+                        // right key
+                        model.sideMovement = model.RIGHT;
+                        break;
+                    case 40:
+                        // down key
+                        model.straightMovement = model.BACKWARD;
+                        break;
+                }
+            };
+            
+            Controller.prototype.handleKeyUp = function(evt){
+                var keycode = ((evt.which) || (evt.keyCode));
+                var model = this.model;
+                switch (keycode) {
+                    case 37:
+                        // left key
+                        model.sideMovement = model.STILL;
+                        break;
+                    case 38:
+                        // up key
+                        model.straightMovement = model.STILL;
+                        break;
+                    case 39:
+                        // right key
+                        model.sideMovement = model.STILL;
+                        break;
+                    case 40:
+                        // down key
+                        model.straightMovement = model.STILL;
+                        break;
+                }
+            };
+            
+            Controller.prototype.attachListeners = function(){
+                var gl = this.gl;
+                var that = this;
+                gl.getCanvas().addEventListener("mousedown", function(evt){
+                    that.handleMouseDown(evt);
+                }, false);
+                
+                gl.getCanvas().addEventListener("mousemove", function(evt){
+                    that.handleMouseMove(evt);
+                }, false);
+                
+                document.addEventListener("mouseup", function(evt){
+                    that.mouseDownPos = null;
+                }, false);
+                
+                document.addEventListener("mouseout", function(evt){
+                    // same as mouseup functionality
+                    that.mouseDownPos = null;
+                }, false);
+                
+                document.addEventListener("keydown", function(evt){
+                    that.handleKeyDown(evt);
+                }, false);
+                
+                document.addEventListener("keyup", function(evt){
+                    that.handleKeyUp(evt);
+                }, false);
+            };
+            
+            /*************************************
+             * Model
+             */
+            function Model(controller){
+                this.controller = controller;
+                this.cubeBuffers = {};
+                this.floorBuffers = {};
+                this.wallBuffers = {};
+                this.angle = 0;
+                this.textures = {};
+                this.cratePositions = [];
+                
+                // movements
+                this.STILL = "STILL";
+                this.FORWARD = "FORWARD";
+                this.BACKWARD = "BACKWARD";
+                this.LEFT = "LEFT";
+                this.RIGHT = "RIGHT";
+                
+                // camera
+                this.camera = {
+                    x: 0,
+                    y: 1.5,
+                    z: 5,
+                    pitch: 0,
+                    yaw: 0
+                };
+                
+                this.straightMovement = this.STILL;
+                this.sideMovement = this.STILL;
+                this.speed = 8; // units per second 
+                this.initBuffers();
+                this.initCratePositions();
+            }
+            
+            Model.prototype.initCratePositions = function(){
+                var crateRange = 45;
+                // randomize 20 floor crates
+                for (var n = 0; n < 20; n++) {
+                    var cratePos = {};
+                    cratePos.x = (Math.random() * crateRange * 2) - crateRange;
+                    cratePos.y = 0;
+                    cratePos.z = (Math.random() * crateRange * 2) - crateRange;
+                    cratePos.rotationY = Math.random() * Math.PI * 2;
+                    this.cratePositions.push(cratePos);
+                    
+                    if (Math.round(Math.random() * 3) == 3) {
+                        var stackedCratePosition = {};
+                        stackedCratePosition.x = cratePos.x;
+                        stackedCratePosition.y = 2.01;
+                        stackedCratePosition.z = cratePos.z;
+                        stackedCratePosition.rotationY = cratePos.rotationY + ((Math.random() * Math.PI / 8) - Math.PI / 16);
+                        this.cratePositions.push(stackedCratePosition);
+                    }
+                }
+            };
+            
+            Model.prototype.initCubeBuffers = function(){
+                var gl = this.controller.gl;
+                this.cubeBuffers.positionBuffer = gl.createArrayBuffer([    
+                  -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, // Front face    
+                  -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, // Back face    
+                  -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1, // Top face    
+                  -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, // Bottom face    
+                  1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, // Right face    
+                  -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1 // Left face
+        ]);
+                
+                this.cubeBuffers.normalBuffer = gl.createArrayBuffer([    
+                  0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, // Front face    
+                  0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, // Back face   
+                  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, // Top face    
+                  0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, // Bottom face    
+                  1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // Right face    
+                  -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0 // Left face
+        ]);
+                
+                this.cubeBuffers.textureBuffer = gl.createArrayBuffer([    
+                  0, 0, 1, 0, 1, 1, 0, 1, // Front face   
+                  1, 0, 1, 1, 0, 1, 0, 0, // Back face   
+                  0, 1, 0, 0, 1, 0, 1, 1, // Top face    
+                  1, 1, 0, 1, 0, 0, 1, 0, // Bottom face   
+                  1, 0, 1, 1, 0, 1, 0, 0, // Right face    
+                  0, 0, 1, 0, 1, 1, 0, 1 // Left face
+        ]);
+                
+                this.cubeBuffers.indexBuffer = gl.createElementArrayBuffer([
+          0, 1, 2, 0, 2, 3, // Front face
+                4, 5, 6, 4, 6, 7, // Back face
+                8, 9, 10, 8, 10, 11, // Top face
+                12, 13, 14, 12, 14, 15, // Bottom face
+                16, 17, 18, 16, 18, 19, // Right face
+                20, 21, 22, 20, 22, 23 // Left face
+              ]);
+            };
+            
+            Model.prototype.initFloorBuffers = function(){
+                var gl = this.controller.gl;
+                this.floorBuffers.positionBuffer = gl.createArrayBuffer([
+          -50, 0, -50, -50, 0, 50, 50, 0, 50, 50, 0, -50
+        ]);
+                
+                this.floorBuffers.textureBuffer = gl.createArrayBuffer([
+          0, 25, 0, 0, 25, 0, 25, 25
+        ]);
+                
+                this.floorBuffers.indexBuffer = gl.createElementArrayBuffer([
+          0, 1, 2, 0, 2, 3
+        ]);
+                
+                // floor normal points upwards
+                this.floorBuffers.normalBuffer = gl.createArrayBuffer([
+          0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
+        ]);
+            };
+            
+            Model.prototype.initWallBuffers = function(){
+                var gl = this.controller.gl;
+                this.wallBuffers.positionBuffer = gl.createArrayBuffer([
+          -50, 5, 0, 50, 5, 0, 50, -5, 0, -50, -5, 0
+        ]);
+                
+                this.wallBuffers.textureBuffer = gl.createArrayBuffer([
+          0, 0, 25, 0, 25, 1.5, 0, 1.5
+        ]);
+                
+                this.wallBuffers.indexBuffer = gl.createElementArrayBuffer([
+          0, 1, 2, 0, 2, 3
+        ]);
+                
+                // floor normal points upwards
+                this.wallBuffers.normalBuffer = gl.createArrayBuffer([
+          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1
+        ]);
+            };
+            
+            Model.prototype.initBuffers = function(){
+                this.initCubeBuffers();
+                this.initFloorBuffers();
+                this.initWallBuffers();
+            };
+            
+            Model.prototype.updateCameraPos = function(){
+                var gl = this.controller.gl;
+                if (this.straightMovement != this.STILL) {
+                    var direction = this.straightMovement == this.FORWARD ? -1 : 1;
+                    var distEachFrame = direction * this.speed * gl.getTimeInterval() / 1000;
+                    this.camera.z += distEachFrame * Math.cos(this.camera.yaw);
+                    this.camera.x += distEachFrame * Math.sin(this.camera.yaw);
+                }
+                
+                if (this.sideMovement != this.STILL) {
+                    var direction = this.sideMovement == this.RIGHT ? 1 : -1;
+                    var distEachFrame = direction * this.speed * gl.getTimeInterval() / 1000;
+                    this.camera.z += distEachFrame * Math.cos(this.camera.yaw + Math.PI / 2);
+                    this.camera.x += distEachFrame * Math.sin(this.camera.yaw + Math.PI / 2);
+                }
+            };
+            
+            /*************************************
+             * View
+             */
+            function View(controller){
+                this.controller = controller;
+                this.canvas = document.getElementById("myCanvas");
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            View.prototype.drawFloor = function(){
+                var controller = this.controller;
+                var gl = controller.gl;
+                var model = controller.model;
+                var floorBuffers = model.floorBuffers;
+                
+                gl.save();
+                gl.translate(0, -1.1, 0);
+                gl.pushPositionBuffer(floorBuffers);
+                gl.pushNormalBuffer(floorBuffers);
+                gl.pushTextureBuffer(floorBuffers, model.textures.metalFloor);
+                gl.pushIndexBuffer(floorBuffers);
+                gl.drawElements(floorBuffers);
+                gl.restore();
+            };
+            
+            View.prototype.drawCeiling = function(){
+                var controller = this.controller;
+                var gl = controller.gl;
+                var model = controller.model;
+                var floorBuffers = model.floorBuffers;
+                
+                gl.save();
+                gl.translate(0, 8.9, 0);
+                // use floor buffers with ceiling texture
+                gl.pushPositionBuffer(floorBuffers);
+                gl.pushNormalBuffer(floorBuffers);
+                gl.pushTextureBuffer(floorBuffers, model.textures.ceiling);
+                gl.pushIndexBuffer(floorBuffers);
+                gl.drawElements(floorBuffers);
+                gl.restore();
+            };
+            
+            View.prototype.drawCrates = function(){
+                var controller = this.controller;
+                var gl = controller.gl;
+                var model = controller.model;
+                var cubeBuffers = model.cubeBuffers;
+                
+                for (var n = 0; n < model.cratePositions.length; n++) {
+                    gl.save();
+                    var cratePos = model.cratePositions[n];
+                    gl.translate(cratePos.x, cratePos.y, cratePos.z);
+                    gl.rotate(cratePos.rotationY, 0, 1, 0);
+                    gl.pushPositionBuffer(cubeBuffers);
+                    gl.pushNormalBuffer(cubeBuffers);
+                    gl.pushTextureBuffer(cubeBuffers, model.textures.crate);
+                    gl.pushIndexBuffer(cubeBuffers);
+                    gl.drawElements(cubeBuffers);
+                    gl.restore();
+                }
+            };
+            
+            View.prototype.drawWalls = function(){
+                var controller = this.controller;
+                var gl = controller.gl;
+                var model = controller.model;
+                var wallBuffers = model.wallBuffers;
+                var metalWallTexture = model.textures.metalWall;
+                
+                gl.save();
+                gl.translate(0, 3.9, -50);
+                gl.pushPositionBuffer(wallBuffers);
+                gl.pushNormalBuffer(wallBuffers);
+                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl.pushIndexBuffer(wallBuffers);
+                gl.drawElements(wallBuffers);
+                gl.restore();
+                
+                gl.save();
+                gl.translate(0, 3.9, 50);
+                gl.rotate(Math.PI, 0, 1, 0);
+                gl.pushPositionBuffer(wallBuffers);
+                gl.pushNormalBuffer(wallBuffers);
+                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl.pushIndexBuffer(wallBuffers);
+                gl.drawElements(wallBuffers);
+                gl.restore();
+                
+                gl.save();
+                gl.translate(50, 3.9, 0);
+                gl.rotate(Math.PI * 1.5, 0, 1, 0);
+                gl.pushPositionBuffer(wallBuffers);
+                gl.pushNormalBuffer(wallBuffers);
+                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl.pushIndexBuffer(wallBuffers);
+                gl.drawElements(wallBuffers);
+                gl.restore();
+                
+                gl.save();
+                gl.translate(-50, 3.9, 0);
+                gl.rotate(Math.PI / 2, 0, 1, 0);
+                gl.pushPositionBuffer(wallBuffers);
+                gl.pushNormalBuffer(wallBuffers);
+                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl.pushIndexBuffer(wallBuffers);
+                gl.drawElements(wallBuffers);
+                gl.restore();
+            };
+            
+            View.prototype.stage = function(){
+                var controller = this.controller;
+                var gl = controller.gl;
+                var model = controller.model;
+                var view = controller.view;
+                var camera = model.camera;
+                model.updateCameraPos();
+        
+                gl.clear();
+        
+                // set field of view at 45 degrees
+                // set viewing range between 0.1 and 100 units away.
+                gl.perspective(45, 0.1, 150.0);
+                gl.identity();
+                
+                gl.rotate(-camera.pitch, 1, 0, 0);
+                gl.rotate(-camera.yaw, 0, 1, 0);
+                gl.translate(-camera.x, -camera.y, -camera.z);
+                
+                // enable lighting
+                gl.enableLighting();
+                gl.setAmbientLighting(0.5, 0.5, 0.5);
+                gl.setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
+                
+                view.drawFloor();
+                view.drawWalls();
+                view.drawCeiling();
+                view.drawCrates();
+            };
+            
+            window.onload = function(){
+                new Controller();
+            };</script>
   </body>
 </html>
