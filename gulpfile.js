@@ -10,6 +10,7 @@ var uglify = require('gulp-uglify');
 var replace = require('gulp-replace');
 var fs = require("fs");
 var size = require('gulp-size');
+var wrap = require("gulp-wrap");
 
 gulp.task('clean', function () {
   return gulp.src('build', {read: false})
@@ -20,10 +21,14 @@ gulp.task('js', function() {
   // for efficiency not using dep management so just manually control concat order
   return gulp.src([
       './src/js/glMatrix.custom.min.js',
+      './src/js/globals.js',
       './src/js/webgl.js',
-      './src/js/index.js'
+      './src/js/model.js',
+      './src/js/view.js',
+      './src/js/controller.js'
     ])
     .pipe(concat('main.js'))
+    .pipe(wrap('(function(){<%= contents %>})();', {}, { parse: false }))
     .pipe(gulp.dest('./tmp'));
 });
 

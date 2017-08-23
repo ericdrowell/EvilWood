@@ -1,64 +1,4 @@
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <title>Evil Wood</title>
-    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-  </head>
-  <body>
-    <canvas id="myCanvas"></canvas>
-
-    <script id="shader-fs" type="x-shader/x-fragment">
-        precision mediump float;
-
-        varying vec2 vTextureCoord;
-        varying vec3 vLightWeighting;
-
-        uniform sampler2D uSampler;
-
-        void main(void) {
-            vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-            gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
-        }
-    </script>
-
-    <script id="shader-vs" type="x-shader/x-vertex">
-        attribute vec3 aVertexPosition;
-        attribute vec3 aVertexNormal;
-        attribute vec2 aTextureCoord;
-
-        uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
-        uniform mat3 uNMatrix;
-
-        uniform vec3 uAmbientColor;
-
-        uniform vec3 uLightingDirection;
-        uniform vec3 uDirectionalColor;
-
-        uniform bool uUseLighting;
-
-        varying vec2 vTextureCoord;
-        varying vec3 vLightWeighting;
-
-        void main(void) {
-            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            vTextureCoord = aTextureCoord;
-
-            if (!uUseLighting) {
-                vLightWeighting = vec3(1.0, 1.0, 1.0);
-            } else {
-                vec3 transformedNormal = uNMatrix * aVertexNormal;
-                float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
-                vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
-            }
-        }
-    </script>
-
-    <script>
-      var GROUND_TEXTURE_ENCODING = 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==';
-    </script>
-
-    <script>// glMatrix v0.9.5
+<!DOCTYPE HTML><html><head><title>Evil Wood</title></head><body><canvas id="scene"></canvas><script>var GROUND_TEXTURE_ENCODING = 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==';</script><script>(function(){// glMatrix v0.9.5
 glMatrixArrayType=typeof Float32Array!="undefined"?Float32Array:typeof WebGLFloatArray!="undefined"?WebGLFloatArray:Array;
 var vec3={};
 vec3.create=function(a){var b=new glMatrixArrayType(3);if(a){b[0]=a[0];b[1]=a[1];b[2]=a[2]}return b};
@@ -81,595 +21,256 @@ v;d[4]=b*w+o*x+r*y;d[5]=f*w+m*x+s*y;d[6]=k*w+n*x+A*y;d[7]=l*w+p*x+B*y;d[8]=b*z+o
 mat4.frustum=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;f[0]=e*2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=e*2/i;f[6]=0;f[7]=0;f[8]=(b+a)/h;f[9]=(d+c)/i;f[10]=-(g+e)/j;f[11]=-1;f[12]=0;f[13]=0;f[14]=-(g*e*2)/j;f[15]=0;return f};
 mat4.perspective=function(a,b,c,d,e){a=c*Math.tan(a*Math.PI/360);b=a*b;return mat4.frustum(-b,b,-a,a,c,d,e)};
 
-var WebGL = function(canvasId){
-    this.canvas = document.getElementById(canvasId);
-    this.context = this.canvas.getContext("experimental-webgl");
-    this.stage = undefined;
-
-    // Animation 
-    this.t = 0;
-    this.timeInterval = 0;
-    this.startTime = 0;
-    this.lastTime = 0;
-    this.frame = 0;
-    this.animating = false;
-    
-    // provided by Paul Irish
-    window.requestAnimFrame = (function(callback){
-        return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function(callback){
-            window.setTimeout(callback, 1000 / 60);
-        };
-    })();
-    
-  /*
-   * encapsulte mat3, mat4, and vec3 from
-   * glMatrix globals
-   */
-    this.mat3 = mat3;
-    this.mat4 = mat4;
-  this.vec3 = vec3;
-    
-    // shader type constants
-    this.BLUE_COLOR = "BLUE_COLOR";
-    this.VARYING_COLOR = "VARYING_COLOR";
-    this.TEXTURE = "TEXTURE";
-    this.TEXTURE_DIRECTIONAL_LIGHTING = "TEXTURE_DIRECTIONAL_LIGHTING";
-    
-    this.shaderProgram = null;
-    this.mvMatrix = this.mat4.create();
-    this.pMatrix = this.mat4.create();
-    this.mvMatrixStack = [];
-    this.context.viewportWidth = this.canvas.width;
-    this.context.viewportHeight = this.canvas.height;
-    
-    // init depth test
-    this.context.enable(this.context.DEPTH_TEST);
+var canvas = document.getElementById('scene'), 
+    context = canvas.getContext('webgl'),
+    shaderProgram = null, 
+    mvMatrix = mat4.create(), 
+    pMatrix = mat4.create(),
+    mvMatrixStack = [];
+function gl_init() {
+  // init depth test
+  context.enable(context.DEPTH_TEST);
 };
 
-// ======================================= GENERAL =======================================
-
-WebGL.prototype.getContext = function(){
-    return this.context;
+function gl_clear() {
+  context.viewport(0, 0, canvas.width, canvas.height);
+  context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
 };
 
-WebGL.prototype.getCanvas = function(){
-    return this.canvas;
+function gl_save() {
+  var copy = mat4.create();
+  mat4.set(mvMatrix, copy);
+  mvMatrixStack.push(copy);
 };
 
-WebGL.prototype.clear = function(){
-    this.context.viewport(0, 0, this.context.viewportWidth, this.context.viewportHeight);
-    this.context.clear(this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT);
+function gl_restore() {
+  if (mvMatrixStack.length == 0) {
+    throw 'Invalid popMatrix!';
+  }
+  mvMatrix = mvMatrixStack.pop();
 };
 
-WebGL.prototype.setStage = function(func){
-    this.stage = func;
+function gl_getFragmentShaderGLSL() {
+  return '#ifdef GL_ES\n' +
+    'precision highp float;\n' +
+    '#endif\n' +
+    'varying vec2 vTextureCoord;\n' +
+    'varying vec3 vLightWeighting;\n' +
+    'uniform sampler2D uSampler;\n' +
+    'void main(void) {\n' +
+    'vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n' +
+    'gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n' +
+    '}';
 };
 
-// ======================================= ANIMATION =======================================
-
-WebGL.prototype.isAnimating = function(){
-    return this.animating;
-};
-WebGL.prototype.getFrame = function(){
-    return this.frame;
-};
-WebGL.prototype.startAnimation = function(){
-    this.animating = true;
-    var date = new Date();
-    this.startTime = date.getTime();
-    this.lastTime = this.startTime;
-    
-    if (this.stage !== undefined) {
-        this.stage();
-    }
-    
-    this.animationLoop();
-};
-WebGL.prototype.stopAnimation = function(){
-    this.animating = false;
-};
-WebGL.prototype.getTimeInterval = function(){
-    return this.timeInterval;
-};
-WebGL.prototype.getTime = function(){
-    return this.t;
-};
-WebGL.prototype.getFps = function(){
-    return this.timeInterval > 0 ? 1000 / this.timeInterval : 0;
-};
-WebGL.prototype.animationLoop = function(){
-    var that = this;
-    
-    this.frame++;
-    var date = new Date();
-    var thisTime = date.getTime();
-    this.timeInterval = thisTime - this.lastTime;
-    this.t += this.timeInterval;
-    this.lastTime = thisTime;
-    
-    if (this.stage !== undefined) {
-        this.stage();
-    }
-    
-    if (this.animating) {
-        requestAnimFrame(function(){
-            that.animationLoop();
-        });
-    }
+function gl_getVertexShaderGLSL() {
+  return 'attribute vec3 aVertexPosition;\n' +
+    'attribute vec3 aVertexNormal;\n' +
+    'attribute vec2 aTextureCoord;\n' +
+    'uniform mat4 uMVMatrix;\n' +
+    'uniform mat4 uPMatrix;\n' +
+    'uniform mat3 uNMatrix;\n' +
+    'uniform vec3 uAmbientColor;\n' +
+    'uniform vec3 uLightingDirection;\n' +
+    'uniform vec3 uDirectionalColor;\n' +
+    'uniform bool uUseLighting;\n' +
+    'varying vec2 vTextureCoord;\n' +
+    'varying vec3 vLightWeighting;\n' +
+    'void main(void) {\n' +
+    'gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n' +
+    'vTextureCoord = aTextureCoord;\n' +
+    'if (!uUseLighting) {\n' +
+    'vLightWeighting = vec3(1.0, 1.0, 1.0);\n' +
+    '} else {\n' +
+    'vec3 transformedNormal = uNMatrix * aVertexNormal;\n' +
+    'float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n' +
+    'vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;\n' +
+    '}\n' +
+    '}';
 };
 
-// ======================================= WEBGL WRAPPER =======================================
-
-WebGL.prototype.save = function(){
-    var copy = this.mat4.create();
-    this.mat4.set(this.mvMatrix, copy);
-    this.mvMatrixStack.push(copy);
+function gl_initShaders() {
+  gl_initPositionShader();
+  gl_initTextureShader();
+  gl_initNormalShader();
+  gl_initLightingShader();
 };
 
-WebGL.prototype.restore = function(){
-    if (this.mvMatrixStack.length == 0) {
-        throw "Invalid popMatrix!";
-    }
-    this.mvMatrix = this.mvMatrixStack.pop();
+function gl_setShaderProgram() {
+  var fragmentGLSL = gl_getFragmentShaderGLSL();
+  var vertexGLSL = gl_getVertexShaderGLSL();
+  
+  var fragmentShader = context.createShader(context.FRAGMENT_SHADER);
+  context.shaderSource(fragmentShader, fragmentGLSL);
+  context.compileShader(fragmentShader);
+  
+  var vertexShader = context.createShader(context.VERTEX_SHADER);
+  context.shaderSource(vertexShader, vertexGLSL);
+  context.compileShader(vertexShader);
+  
+  shaderProgram = context.createProgram();
+  context.attachShader(shaderProgram, vertexShader);
+  context.attachShader(shaderProgram, fragmentShader);
+  context.linkProgram(shaderProgram);
+  
+  if (!context.getProgramParameter(shaderProgram, context.LINK_STATUS)) {
+    alert('Could not initialize shaders');
+  }
+  
+  context.useProgram(shaderProgram);
+  
+  // once shader program is loaded, it's time to init the shaders
+  gl_initShaders();
 };
 
-WebGL.prototype.getFragmentShaderGLSL = function(shaderType){
-    switch (shaderType) {
-        case this.BLUE_COLOR:
-            return "#ifdef GL_ES\n" +
-            "precision highp float;\n" +
-            "#endif\n" +
-            "void main(void) {\n" +
-            "gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\n" +
-            "}";
-        case this.VARYING_COLOR:
-            return "#ifdef GL_ES\n" +
-            "precision highp float;\n" +
-            "#endif\n" +
-            "varying vec4 vColor;\n" +
-            "void main(void) {\n" +
-            "gl_FragColor = vColor;\n" +
-            "}";
-        case this.TEXTURE:
-            return "#ifdef GL_ES\n" +
-            "precision highp float;\n" +
-            "#endif\n" +
-            "varying vec2 vTextureCoord;\n" +
-            "uniform sampler2D uSampler;\n" +
-            "void main(void) {\n" +
-            "gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n" +
-            "}";
-        case this.TEXTURE_DIRECTIONAL_LIGHTING:
-            return "#ifdef GL_ES\n" +
-            "precision highp float;\n" +
-            "#endif\n" +
-            "varying vec2 vTextureCoord;\n" +
-            "varying vec3 vLightWeighting;\n" +
-            "uniform sampler2D uSampler;\n" +
-            "void main(void) {\n" +
-            "vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n" +
-            "gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n" +
-            "}";
-    }
+function gl_perspective(viewAngle, minDist, maxDist) {
+  mat4.perspective(viewAngle, canvas.width / canvas.height, minDist, maxDist, pMatrix);
 };
 
-WebGL.prototype.getVertexShaderGLSL = function(shaderType){
-    switch (shaderType) {
-        case this.BLUE_COLOR:
-            return "attribute vec3 aVertexPosition;\n" +
-            "uniform mat4 uMVMatrix;\n" +
-            "uniform mat4 uPMatrix;\n" +
-            "void main(void) {\n" +
-            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
-            "}";
-        case this.VARYING_COLOR:
-            return "attribute vec3 aVertexPosition;\n" +
-            "attribute vec4 aVertexColor;\n" +
-            "uniform mat4 uMVMatrix;\n" +
-            "uniform mat4 uPMatrix;\n" +
-            "varying vec4 vColor;\n" +
-            "void main(void) {\n" +
-            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
-            "vColor = aVertexColor;\n" +
-            "}";
-        case this.TEXTURE:
-            return "attribute vec3 aVertexPosition;\n" +
-            "attribute vec2 aTextureCoord;\n" +
-            "uniform mat4 uMVMatrix;\n" +
-            "uniform mat4 uPMatrix;\n" +
-            "varying vec2 vTextureCoord;\n" +
-            "void main(void) {\n" +
-            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
-            "vTextureCoord = aTextureCoord;\n" +
-            "}";
-        case this.TEXTURE_DIRECTIONAL_LIGHTING:
-            return "attribute vec3 aVertexPosition;\n" +
-            "attribute vec3 aVertexNormal;\n" +
-            "attribute vec2 aTextureCoord;\n" +
-            "uniform mat4 uMVMatrix;\n" +
-            "uniform mat4 uPMatrix;\n" +
-            "uniform mat3 uNMatrix;\n" +
-            "uniform vec3 uAmbientColor;\n" +
-            "uniform vec3 uLightingDirection;\n" +
-            "uniform vec3 uDirectionalColor;\n" +
-            "uniform bool uUseLighting;\n" +
-            "varying vec2 vTextureCoord;\n" +
-            "varying vec3 vLightWeighting;\n" +
-            "void main(void) {\n" +
-            "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
-            "vTextureCoord = aTextureCoord;\n" +
-            "if (!uUseLighting) {\n" +
-            "vLightWeighting = vec3(1.0, 1.0, 1.0);\n" +
-            "} else {\n" +
-            "vec3 transformedNormal = uNMatrix * aVertexNormal;\n" +
-            "float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n" +
-            "vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;\n" +
-            "}\n" +
-            "}";
-    }
+function gl_identity() {
+  mat4.identity(mvMatrix);
 };
 
-WebGL.prototype.initShaders = function(shaderType){
-    this.initPositionShader();
-    
-    switch (shaderType) {
-        case this.VARYING_COLOR:
-            this.initColorShader();
-            break;
-        case this.TEXTURE:
-            this.initTextureShader();
-            break;
-        case this.TEXTURE_DIRECTIONAL_LIGHTING:
-            this.initTextureShader();
-            this.initNormalShader();
-            this.initLightingShader();
-            break;
-    }
+function gl_translate(x, y, z) {
+  mat4.translate(mvMatrix, [x, y, z]);
 };
 
-WebGL.prototype.setShaderProgram = function(shaderType){
-    var fragmentGLSL = this.getFragmentShaderGLSL(shaderType);
-    var vertexGLSL = this.getVertexShaderGLSL(shaderType);
-    
-    var fragmentShader = this.context.createShader(this.context.FRAGMENT_SHADER);
-    this.context.shaderSource(fragmentShader, fragmentGLSL);
-    this.context.compileShader(fragmentShader);
-    
-    var vertexShader = this.context.createShader(this.context.VERTEX_SHADER);
-    this.context.shaderSource(vertexShader, vertexGLSL);
-    this.context.compileShader(vertexShader);
-    
-    this.shaderProgram = this.context.createProgram();
-    this.context.attachShader(this.shaderProgram, vertexShader);
-    this.context.attachShader(this.shaderProgram, fragmentShader);
-    this.context.linkProgram(this.shaderProgram);
-    
-    if (!this.context.getProgramParameter(this.shaderProgram, this.context.LINK_STATUS)) {
-        alert("Could not initialize shaders");
-    }
-    
-    this.context.useProgram(this.shaderProgram);
-    
-    // once shader program is loaded, it's time to init the shaders
-    this.initShaders(shaderType);
+function gl_rotate(angle, x, y, z) {
+  mat4.rotate(mvMatrix, angle, [x, y, z]);
 };
 
-WebGL.prototype.perspective = function(viewAngle, minDist, maxDist){
-    this.mat4.perspective(viewAngle, this.context.viewportWidth / this.context.viewportHeight, minDist, maxDist, this.pMatrix);
+function gl_initPositionShader() {
+  shaderProgram.vertexPositionAttribute = context.getAttribLocation(shaderProgram, 'aVertexPosition');
+  context.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+  shaderProgram.pMatrixUniform = context.getUniformLocation(shaderProgram, 'uPMatrix');
+  shaderProgram.mvMatrixUniform = context.getUniformLocation(shaderProgram, 'uMVMatrix');
 };
 
-WebGL.prototype.identity = function(){
-    this.mat4.identity(this.mvMatrix);
+function gl_initColorShader() {
+  shaderProgram.vertexColorAttribute = context.getAttribLocation(shaderProgram, 'aVertexColor');
+  context.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 };
 
-WebGL.prototype.translate = function(x, y, z){
-    this.mat4.translate(this.mvMatrix, [x, y, z]);
+function gl_initTextureShader() {
+  shaderProgram.textureCoordAttribute = context.getAttribLocation(shaderProgram, 'aTextureCoord');
+  context.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+  shaderProgram.samplerUniform = context.getUniformLocation(shaderProgram, 'uSampler');
 };
 
-WebGL.prototype.rotate = function(angle, x, y, z){
-    this.mat4.rotate(this.mvMatrix, angle, [x, y, z]);
+function gl_initNormalShader() {
+  shaderProgram.vertexNormalAttribute = context.getAttribLocation(shaderProgram, 'aVertexNormal');
+  context.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
+  shaderProgram.nMatrixUniform = context.getUniformLocation(shaderProgram, 'uNMatrix');
 };
 
-WebGL.prototype.initPositionShader = function(){
-    this.shaderProgram.vertexPositionAttribute = this.context.getAttribLocation(this.shaderProgram, "aVertexPosition");
-    this.context.enableVertexAttribArray(this.shaderProgram.vertexPositionAttribute);
-    this.shaderProgram.pMatrixUniform = this.context.getUniformLocation(this.shaderProgram, "uPMatrix");
-    this.shaderProgram.mvMatrixUniform = this.context.getUniformLocation(this.shaderProgram, "uMVMatrix");
+function gl_initLightingShader() {
+  shaderProgram.useLightingUniform = context.getUniformLocation(shaderProgram, 'uUseLighting');
+  shaderProgram.ambientColorUniform = context.getUniformLocation(shaderProgram, 'uAmbientColor');
+  shaderProgram.lightingDirectionUniform = context.getUniformLocation(shaderProgram, 'uLightingDirection');
+  shaderProgram.directionalColorUniform = context.getUniformLocation(shaderProgram, 'uDirectionalColor');
 };
 
-WebGL.prototype.initColorShader = function(){
-    this.shaderProgram.vertexColorAttribute = this.context.getAttribLocation(this.shaderProgram, "aVertexColor");
-    this.context.enableVertexAttribArray(this.shaderProgram.vertexColorAttribute);
+function gl_initTexture(texture) {
+  context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
+  context.bindTexture(context.TEXTURE_2D, texture);
+  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, texture.image);
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.NEAREST);
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR_MIPMAP_NEAREST);
+  context.generateMipmap(context.TEXTURE_2D);
+  context.bindTexture(context.TEXTURE_2D, null);
 };
 
-WebGL.prototype.initTextureShader = function(){
-    this.shaderProgram.textureCoordAttribute = this.context.getAttribLocation(this.shaderProgram, "aTextureCoord");
-    this.context.enableVertexAttribArray(this.shaderProgram.textureCoordAttribute);
-    this.shaderProgram.samplerUniform = this.context.getUniformLocation(this.shaderProgram, "uSampler");
+function gl_createArrayBuffer(vertices) {
+  var buffer = context.createBuffer();
+  buffer.numElements = vertices.length;
+  context.bindBuffer(context.ARRAY_BUFFER, buffer);
+  context.bufferData(context.ARRAY_BUFFER, new Float32Array(vertices), context.STATIC_DRAW);
+  return buffer;
 };
 
-WebGL.prototype.initNormalShader = function(){
-    this.shaderProgram.vertexNormalAttribute = this.context.getAttribLocation(this.shaderProgram, "aVertexNormal");
-    this.context.enableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);
-    this.shaderProgram.nMatrixUniform = this.context.getUniformLocation(this.shaderProgram, "uNMatrix");
+function gl_createElementArrayBuffer(vertices) {
+  var buffer = context.createBuffer();
+  buffer.numElements = vertices.length;
+  context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffer);
+  context.bufferData(context.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices), context.STATIC_DRAW);
+  return buffer;
 };
 
-WebGL.prototype.initLightingShader = function(){
-    this.shaderProgram.useLightingUniform = this.context.getUniformLocation(this.shaderProgram, "uUseLighting");
-    this.shaderProgram.ambientColorUniform = this.context.getUniformLocation(this.shaderProgram, "uAmbientColor");
-    this.shaderProgram.lightingDirectionUniform = this.context.getUniformLocation(this.shaderProgram, "uLightingDirection");
-    this.shaderProgram.directionalColorUniform = this.context.getUniformLocation(this.shaderProgram, "uDirectionalColor");
-};
-
-WebGL.prototype.initTexture = function(texture){
-    this.context.pixelStorei(this.context.UNPACK_FLIP_Y_WEBGL, true);
-    this.context.bindTexture(this.context.TEXTURE_2D, texture);
-    this.context.texImage2D(this.context.TEXTURE_2D, 0, this.context.RGBA, this.context.RGBA, this.context.UNSIGNED_BYTE, texture.image);
-    this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MAG_FILTER, this.context.NEAREST);
-    this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MIN_FILTER, this.context.LINEAR_MIPMAP_NEAREST);
-    this.context.generateMipmap(this.context.TEXTURE_2D);
-    this.context.bindTexture(this.context.TEXTURE_2D, null);
-};
-
-WebGL.prototype.createArrayBuffer = function(vertices){
-    var buffer = this.context.createBuffer();
-    buffer.numElements = vertices.length;
-    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffer);
-    this.context.bufferData(this.context.ARRAY_BUFFER, new Float32Array(vertices), this.context.STATIC_DRAW);
-    return buffer;
-};
-
-WebGL.prototype.createElementArrayBuffer = function(vertices){
-    var buffer = this.context.createBuffer();
-    buffer.numElements = vertices.length;
-    this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, buffer);
-    this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices), this.context.STATIC_DRAW);
-    return buffer;
-};
-
-WebGL.prototype.pushPositionBuffer = function(buffers){
-    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.positionBuffer);
-    this.context.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, 3, this.context.FLOAT, false, 0, 0);
+function gl_pushPositionBuffer(buffers) {
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.positionBuffer);
+  context.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, context.FLOAT, false, 0, 0);
 };
 
 
-WebGL.prototype.pushColorBuffer = function(buffers){
-    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.colorBuffer);
-    this.context.vertexAttribPointer(this.shaderProgram.vertexColorAttribute, 4, this.context.FLOAT, false, 0, 0);
+function gl_pushColorBuffer(buffers) {
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.colorBuffer);
+  context.vertexAttribPointer(shaderProgram.vertexColorAttribute, 4, context.FLOAT, false, 0, 0);
 };
 
-WebGL.prototype.pushTextureBuffer = function(buffers, texture){
-    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.textureBuffer);
-    this.context.vertexAttribPointer(this.shaderProgram.textureCoordAttribute, 2, this.context.FLOAT, false, 0, 0);
-    this.context.activeTexture(this.context.TEXTURE0);
-    this.context.bindTexture(this.context.TEXTURE_2D, texture);
-    this.context.uniform1i(this.shaderProgram.samplerUniform, 0);
+function gl_pushTextureBuffer(buffers, texture) {
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.textureBuffer);
+  context.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, context.FLOAT, false, 0, 0);
+  context.activeTexture(context.TEXTURE0);
+  context.bindTexture(context.TEXTURE_2D, texture);
+  context.uniform1i(shaderProgram.samplerUniform, 0);
 };
 
-WebGL.prototype.pushIndexBuffer = function(buffers){
-    this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
+function gl_pushIndexBuffer(buffers) {
+  context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
 };
 
-WebGL.prototype.pushNormalBuffer = function(buffers){
-    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffers.normalBuffer);
-    this.context.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.context.FLOAT, false, 0, 0);
+function gl_pushNormalBuffer(buffers) {
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.normalBuffer);
+  context.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, context.FLOAT, false, 0, 0);
 };
 
-WebGL.prototype.setMatrixUniforms = function(){
-    this.context.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
-    this.context.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, this.mvMatrix);
-    
-    var normalMatrix = this.mat3.create();
-    this.mat4.toInverseMat3(this.mvMatrix, normalMatrix);
-    this.mat3.transpose(normalMatrix);
-    this.context.uniformMatrix3fv(this.shaderProgram.nMatrixUniform, false, normalMatrix);
+function gl_setMatrixUniforms() {
+  context.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+  context.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+  
+  var normalMatrix = mat3.create();
+  mat4.toInverseMat3(mvMatrix, normalMatrix);
+  mat3.transpose(normalMatrix);
+  context.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
 };
 
-WebGL.prototype.drawElements = function(buffers){
-    this.setMatrixUniforms();
-    
-    // draw elements
-    this.context.drawElements(this.context.TRIANGLES, buffers.indexBuffer.numElements, this.context.UNSIGNED_SHORT, 0);
+function gl_drawElements(buffers) {
+  gl_setMatrixUniforms();
+  
+  // draw elements
+  context.drawElements(context.TRIANGLES, buffers.indexBuffer.numElements, context.UNSIGNED_SHORT, 0);
 };
 
-WebGL.prototype.drawArrays = function(buffers){
-    this.setMatrixUniforms();
-    
-    // draw arrays
-    this.context.drawArrays(this.context.TRIANGLES, 0, buffers.positionBuffer.numElements / 3);
+function l_drawArrays(buffers) {
+  gl_setMatrixUniforms();
+  
+  // draw arrays
+  context.drawArrays(context.TRIANGLES, 0, buffers.positionBuffer.numElements / 3);
 };
 
-WebGL.prototype.enableLighting = function(){
-    this.context.uniform1i(this.shaderProgram.useLightingUniform, true);
+function gl_enableLighting() {
+  context.uniform1i(shaderProgram.useLightingUniform, true);
 };
 
-WebGL.prototype.setAmbientLighting = function(red, green, blue){
-    this.context.uniform3f(this.shaderProgram.ambientColorUniform, parseFloat(red), parseFloat(green), parseFloat(blue));
+function gl_setAmbientLighting(red, green, blue) {
+  context.uniform3f(shaderProgram.ambientColorUniform, parseFloat(red), parseFloat(green), parseFloat(blue));
 };
 
-WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
-    // directional lighting
-    var lightingDirection = [x, y, z];
-    var adjustedLD = this.vec3.create();
-    this.vec3.normalize(lightingDirection, adjustedLD);
-    this.vec3.scale(adjustedLD, -1);
-    this.context.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
-    
-    // directional color
-    this.context.uniform3f(this.shaderProgram.directionalColorUniform, parseFloat(red), parseFloat(green), parseFloat(blue));
+function gl_setDirectionalLighting(x, y, z, red, green, blue) {
+  // directional lighting
+  var lightingDirection = [x, y, z];
+  var adjustedLD = vec3.create();
+  vec3.normalize(lightingDirection, adjustedLD);
+  vec3.scale(adjustedLD, -1);
+  context.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD);
+  
+  // directional color
+  context.uniform3f(shaderProgram.directionalColorUniform, parseFloat(red), parseFloat(green), parseFloat(blue));
 };
-            /*************************************
-             * Controller
-             */
-            function Controller(){
-                this.view = new View(this);
-                this.gl = new WebGL("myCanvas");
-                this.gl.setShaderProgram("TEXTURE_DIRECTIONAL_LIGHTING");
-                this.model = new Model(this);
-                
-                this.attachListeners();
-                
-                var sources = {
-                    crate: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==',
-                    metalFloor: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==',
-                    metalWall: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==',
-                    ceiling: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw=='
-                };
-                
-                this.mouseDownPos = null;
-                this.mouseDownPitch = 0;
-                this.mouseDownYaw = 0;
-                
-                var that = this;
-                this.loadTextures(sources, function(){
-                    that.gl.setStage(function(){
-                        that.view.stage();
-                    });
-                    
-                    that.gl.startAnimation();
-                });
-            }
-            
-            Controller.prototype.loadTextures = function(sources, callback){
-                var gl = this.gl;
-                var context = gl.getContext();
-                var textures = this.model.textures;
-                var loadedImages = 0;
-                var numImages = 0;
-                for (var src in sources) {
-                    // anonymous function to induce scope
-                    (function(){
-                        var key = src;
-                        numImages++;
-                        textures[key] = context.createTexture();
-                        textures[key].image = new Image();
-                        textures[key].image.onload = function(){
-                            gl.initTexture(textures[key]);
-                            if (++loadedImages >= numImages) {
-                                callback();
-                            }
-                        };
-                        
-                        textures[key].image.src = sources[key];
-                    })();
-                }
-            };
-            
-            Controller.prototype.getMousePos = function(evt){
-                return {
-                    x: evt.clientX,
-                    y: evt.clientY
-                };
-            };
-            
-            Controller.prototype.handleMouseDown = function(evt){
-                var camera = this.model.camera;
-                this.mouseDownPos = this.getMousePos(evt);
-                this.mouseDownPitch = camera.pitch;
-                this.mouseDownYaw = camera.yaw;
-            };
-            
-            Controller.prototype.handleMouseMove = function(evt){
-                var mouseDownPos = this.mouseDownPos;
-                var gl = this.gl;
-                if (mouseDownPos !== null) {
-                    var mousePos = this.getMousePos(evt);
-                    
-                    // update pitch
-                    var yDiff = mousePos.y - mouseDownPos.y;
-                    this.model.camera.pitch = this.mouseDownPitch + yDiff / gl.getCanvas().height;
-                    
-                    // update yaw
-                    var xDiff = mousePos.x - mouseDownPos.x;
-                    this.model.camera.yaw = this.mouseDownYaw + xDiff / gl.getCanvas().width;
-                }
-            };
-            
-            Controller.prototype.handleKeyDown = function(evt){
-                var keycode = ((evt.which) || (evt.keyCode));
-                var model = this.model;
-                switch (keycode) {
-                    case 37:
-                        // left key
-                        model.sideMovement = model.LEFT;
-                        break;
-                    case 38:
-                        // up key
-                        model.straightMovement = model.FORWARD;
-                        break;
-                    case 39:
-                        // right key
-                        model.sideMovement = model.RIGHT;
-                        break;
-                    case 40:
-                        // down key
-                        model.straightMovement = model.BACKWARD;
-                        break;
-                }
-            };
-            
-            Controller.prototype.handleKeyUp = function(evt){
-                var keycode = ((evt.which) || (evt.keyCode));
-                var model = this.model;
-                switch (keycode) {
-                    case 37:
-                        // left key
-                        model.sideMovement = model.STILL;
-                        break;
-                    case 38:
-                        // up key
-                        model.straightMovement = model.STILL;
-                        break;
-                    case 39:
-                        // right key
-                        model.sideMovement = model.STILL;
-                        break;
-                    case 40:
-                        // down key
-                        model.straightMovement = model.STILL;
-                        break;
-                }
-            };
-            
-            Controller.prototype.attachListeners = function(){
-                var gl = this.gl;
-                var that = this;
-                gl.getCanvas().addEventListener("mousedown", function(evt){
-                    that.handleMouseDown(evt);
-                }, false);
-                
-                gl.getCanvas().addEventListener("mousemove", function(evt){
-                    that.handleMouseMove(evt);
-                }, false);
-                
-                document.addEventListener("mouseup", function(evt){
-                    that.mouseDownPos = null;
-                }, false);
-                
-                document.addEventListener("mouseout", function(evt){
-                    // same as mouseup functionality
-                    that.mouseDownPos = null;
-                }, false);
-                
-                document.addEventListener("keydown", function(evt){
-                    that.handleKeyDown(evt);
-                }, false);
-                
-                document.addEventListener("keyup", function(evt){
-                    that.handleKeyUp(evt);
-                }, false);
-            };
-            
             /*************************************
              * Model
              */
-            function Model(controller){
-                this.controller = controller;
+            function Model() {
                 this.cubeBuffers = {};
                 this.floorBuffers = {};
                 this.wallBuffers = {};
@@ -678,11 +279,11 @@ WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
                 this.cratePositions = [];
                 
                 // movements
-                this.STILL = "STILL";
-                this.FORWARD = "FORWARD";
-                this.BACKWARD = "BACKWARD";
-                this.LEFT = "LEFT";
-                this.RIGHT = "RIGHT";
+                this.STILL = 'STILL';
+                this.FORWARD = 'FORWARD';
+                this.BACKWARD = 'BACKWARD';
+                this.LEFT = 'LEFT';
+                this.RIGHT = 'RIGHT';
                 
                 // camera
                 this.camera = {
@@ -700,7 +301,7 @@ WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
                 this.initCratePositions();
             }
             
-            Model.prototype.initCratePositions = function(){
+            Model.prototype.initCratePositions = function() {
                 var crateRange = 45;
                 // randomize 20 floor crates
                 for (var n = 0; n < 20; n++) {
@@ -722,9 +323,8 @@ WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
                 }
             };
             
-            Model.prototype.initCubeBuffers = function(){
-                var gl = this.controller.gl;
-                this.cubeBuffers.positionBuffer = gl.createArrayBuffer([    
+            Model.prototype.initCubeBuffers = function() {
+                this.cubeBuffers.positionBuffer = gl_createArrayBuffer([    
                   -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, // Front face    
                   -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, // Back face    
                   -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1, // Top face    
@@ -733,7 +333,7 @@ WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
                   -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1 // Left face
         ]);
                 
-                this.cubeBuffers.normalBuffer = gl.createArrayBuffer([    
+                this.cubeBuffers.normalBuffer = gl_createArrayBuffer([    
                   0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, // Front face    
                   0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, // Back face   
                   0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, // Top face    
@@ -742,7 +342,7 @@ WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
                   -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0 // Left face
         ]);
                 
-                this.cubeBuffers.textureBuffer = gl.createArrayBuffer([    
+                this.cubeBuffers.textureBuffer = gl_createArrayBuffer([    
                   0, 0, 1, 0, 1, 1, 0, 1, // Front face   
                   1, 0, 1, 1, 0, 1, 0, 0, // Back face   
                   0, 1, 0, 0, 1, 0, 1, 1, // Top face    
@@ -751,7 +351,7 @@ WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
                   0, 0, 1, 0, 1, 1, 0, 1 // Left face
         ]);
                 
-                this.cubeBuffers.indexBuffer = gl.createElementArrayBuffer([
+                this.cubeBuffers.indexBuffer = gl_createElementArrayBuffer([
           0, 1, 2, 0, 2, 3, // Front face
                 4, 5, 6, 4, 6, 7, // Back face
                 8, 9, 10, 8, 10, 11, // Top face
@@ -761,211 +361,283 @@ WebGL.prototype.setDirectionalLighting = function(x, y, z, red, green, blue){
               ]);
             };
             
-            Model.prototype.initFloorBuffers = function(){
-                var gl = this.controller.gl;
-                this.floorBuffers.positionBuffer = gl.createArrayBuffer([
+            Model.prototype.initFloorBuffers = function() {
+                this.floorBuffers.positionBuffer = gl_createArrayBuffer([
           -50, 0, -50, -50, 0, 50, 50, 0, 50, 50, 0, -50
         ]);
                 
-                this.floorBuffers.textureBuffer = gl.createArrayBuffer([
+                this.floorBuffers.textureBuffer = gl_createArrayBuffer([
           0, 25, 0, 0, 25, 0, 25, 25
         ]);
                 
-                this.floorBuffers.indexBuffer = gl.createElementArrayBuffer([
+                this.floorBuffers.indexBuffer = gl_createElementArrayBuffer([
           0, 1, 2, 0, 2, 3
         ]);
                 
                 // floor normal points upwards
-                this.floorBuffers.normalBuffer = gl.createArrayBuffer([
+                this.floorBuffers.normalBuffer = gl_createArrayBuffer([
           0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
         ]);
             };
             
-            Model.prototype.initWallBuffers = function(){
-                var gl = this.controller.gl;
-                this.wallBuffers.positionBuffer = gl.createArrayBuffer([
+            Model.prototype.initWallBuffers = function() {
+                this.wallBuffers.positionBuffer = gl_createArrayBuffer([
           -50, 5, 0, 50, 5, 0, 50, -5, 0, -50, -5, 0
         ]);
                 
-                this.wallBuffers.textureBuffer = gl.createArrayBuffer([
+                this.wallBuffers.textureBuffer = gl_createArrayBuffer([
           0, 0, 25, 0, 25, 1.5, 0, 1.5
         ]);
                 
-                this.wallBuffers.indexBuffer = gl.createElementArrayBuffer([
+                this.wallBuffers.indexBuffer = gl_createElementArrayBuffer([
           0, 1, 2, 0, 2, 3
         ]);
                 
                 // floor normal points upwards
-                this.wallBuffers.normalBuffer = gl.createArrayBuffer([
+                this.wallBuffers.normalBuffer = gl_createArrayBuffer([
           0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1
         ]);
             };
             
-            Model.prototype.initBuffers = function(){
+            Model.prototype.initBuffers = function() {
                 this.initCubeBuffers();
                 this.initFloorBuffers();
                 this.initWallBuffers();
             };
             
-            Model.prototype.updateCameraPos = function(){
-                var gl = this.controller.gl;
+            Model.prototype.updateCameraPos = function() {
                 if (this.straightMovement != this.STILL) {
                     var direction = this.straightMovement == this.FORWARD ? -1 : 1;
-                    var distEachFrame = direction * this.speed * gl.getTimeInterval() / 1000;
+                    var distEachFrame = direction * this.speed * 0 / 1000;
                     this.camera.z += distEachFrame * Math.cos(this.camera.yaw);
                     this.camera.x += distEachFrame * Math.sin(this.camera.yaw);
                 }
                 
                 if (this.sideMovement != this.STILL) {
                     var direction = this.sideMovement == this.RIGHT ? 1 : -1;
-                    var distEachFrame = direction * this.speed * gl.getTimeInterval() / 1000;
+                    var distEachFrame = direction * this.speed * 0 / 1000;
                     this.camera.z += distEachFrame * Math.cos(this.camera.yaw + Math.PI / 2);
                     this.camera.x += distEachFrame * Math.sin(this.camera.yaw + Math.PI / 2);
                 }
             };
-            
             /*************************************
              * View
              */
-            function View(controller){
-                this.controller = controller;
-                this.canvas = document.getElementById("myCanvas");
+            function View(){
+                this.canvas = document.getElementById('scene');
                 this.canvas.width = window.innerWidth;
                 this.canvas.height = window.innerHeight;
             }
             
             View.prototype.drawFloor = function(){
-                var controller = this.controller;
-                var gl = controller.gl;
-                var model = controller.model;
                 var floorBuffers = model.floorBuffers;
                 
-                gl.save();
-                gl.translate(0, -1.1, 0);
-                gl.pushPositionBuffer(floorBuffers);
-                gl.pushNormalBuffer(floorBuffers);
-                gl.pushTextureBuffer(floorBuffers, model.textures.metalFloor);
-                gl.pushIndexBuffer(floorBuffers);
-                gl.drawElements(floorBuffers);
-                gl.restore();
+                gl_save();
+                gl_translate(0, -1.1, 0);
+                gl_pushPositionBuffer(floorBuffers);
+                gl_pushNormalBuffer(floorBuffers);
+                gl_pushTextureBuffer(floorBuffers, model.textures.metalFloor);
+                gl_pushIndexBuffer(floorBuffers);
+                gl_drawElements(floorBuffers);
+                gl_restore();
             };
             
             View.prototype.drawCeiling = function(){
-                var controller = this.controller;
-                var gl = controller.gl;
-                var model = controller.model;
                 var floorBuffers = model.floorBuffers;
                 
-                gl.save();
-                gl.translate(0, 8.9, 0);
+                gl_save();
+                gl_translate(0, 8.9, 0);
                 // use floor buffers with ceiling texture
-                gl.pushPositionBuffer(floorBuffers);
-                gl.pushNormalBuffer(floorBuffers);
-                gl.pushTextureBuffer(floorBuffers, model.textures.ceiling);
-                gl.pushIndexBuffer(floorBuffers);
-                gl.drawElements(floorBuffers);
-                gl.restore();
+                gl_pushPositionBuffer(floorBuffers);
+                gl_pushNormalBuffer(floorBuffers);
+                gl_pushTextureBuffer(floorBuffers, model.textures.ceiling);
+                gl_pushIndexBuffer(floorBuffers);
+                gl_drawElements(floorBuffers);
+                gl_restore();
             };
             
             View.prototype.drawCrates = function(){
-                var controller = this.controller;
-                var gl = controller.gl;
-                var model = controller.model;
                 var cubeBuffers = model.cubeBuffers;
                 
                 for (var n = 0; n < model.cratePositions.length; n++) {
-                    gl.save();
+                    gl_save();
                     var cratePos = model.cratePositions[n];
-                    gl.translate(cratePos.x, cratePos.y, cratePos.z);
-                    gl.rotate(cratePos.rotationY, 0, 1, 0);
-                    gl.pushPositionBuffer(cubeBuffers);
-                    gl.pushNormalBuffer(cubeBuffers);
-                    gl.pushTextureBuffer(cubeBuffers, model.textures.crate);
-                    gl.pushIndexBuffer(cubeBuffers);
-                    gl.drawElements(cubeBuffers);
-                    gl.restore();
+                    gl_translate(cratePos.x, cratePos.y, cratePos.z);
+                    gl_rotate(cratePos.rotationY, 0, 1, 0);
+                    gl_pushPositionBuffer(cubeBuffers);
+                    gl_pushNormalBuffer(cubeBuffers);
+                    gl_pushTextureBuffer(cubeBuffers, model.textures.crate);
+                    gl_pushIndexBuffer(cubeBuffers);
+                    gl_drawElements(cubeBuffers);
+                    gl_restore();
                 }
             };
             
             View.prototype.drawWalls = function(){
-                var controller = this.controller;
-                var gl = controller.gl;
-                var model = controller.model;
                 var wallBuffers = model.wallBuffers;
                 var metalWallTexture = model.textures.metalWall;
                 
-                gl.save();
-                gl.translate(0, 3.9, -50);
-                gl.pushPositionBuffer(wallBuffers);
-                gl.pushNormalBuffer(wallBuffers);
-                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl.pushIndexBuffer(wallBuffers);
-                gl.drawElements(wallBuffers);
-                gl.restore();
+                gl_save();
+                gl_translate(0, 3.9, -50);
+                gl_pushPositionBuffer(wallBuffers);
+                gl_pushNormalBuffer(wallBuffers);
+                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl_pushIndexBuffer(wallBuffers);
+                gl_drawElements(wallBuffers);
+                gl_restore();
                 
-                gl.save();
-                gl.translate(0, 3.9, 50);
-                gl.rotate(Math.PI, 0, 1, 0);
-                gl.pushPositionBuffer(wallBuffers);
-                gl.pushNormalBuffer(wallBuffers);
-                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl.pushIndexBuffer(wallBuffers);
-                gl.drawElements(wallBuffers);
-                gl.restore();
+                gl_save();
+                gl_translate(0, 3.9, 50);
+                gl_rotate(Math.PI, 0, 1, 0);
+                gl_pushPositionBuffer(wallBuffers);
+                gl_pushNormalBuffer(wallBuffers);
+                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl_pushIndexBuffer(wallBuffers);
+                gl_drawElements(wallBuffers);
+                gl_restore();
                 
-                gl.save();
-                gl.translate(50, 3.9, 0);
-                gl.rotate(Math.PI * 1.5, 0, 1, 0);
-                gl.pushPositionBuffer(wallBuffers);
-                gl.pushNormalBuffer(wallBuffers);
-                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl.pushIndexBuffer(wallBuffers);
-                gl.drawElements(wallBuffers);
-                gl.restore();
+                gl_save();
+                gl_translate(50, 3.9, 0);
+                gl_rotate(Math.PI * 1.5, 0, 1, 0);
+                gl_pushPositionBuffer(wallBuffers);
+                gl_pushNormalBuffer(wallBuffers);
+                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl_pushIndexBuffer(wallBuffers);
+                gl_drawElements(wallBuffers);
+                gl_restore();
                 
-                gl.save();
-                gl.translate(-50, 3.9, 0);
-                gl.rotate(Math.PI / 2, 0, 1, 0);
-                gl.pushPositionBuffer(wallBuffers);
-                gl.pushNormalBuffer(wallBuffers);
-                gl.pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl.pushIndexBuffer(wallBuffers);
-                gl.drawElements(wallBuffers);
-                gl.restore();
+                gl_save();
+                gl_translate(-50, 3.9, 0);
+                gl_rotate(Math.PI / 2, 0, 1, 0);
+                gl_pushPositionBuffer(wallBuffers);
+                gl_pushNormalBuffer(wallBuffers);
+                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
+                gl_pushIndexBuffer(wallBuffers);
+                gl_drawElements(wallBuffers);
+                gl_restore();
             };
             
             View.prototype.stage = function(){
-                var controller = this.controller;
-                var gl = controller.gl;
-                var model = controller.model;
-                var view = controller.view;
                 var camera = model.camera;
                 model.updateCameraPos();
         
-                gl.clear();
+                gl_clear();
         
                 // set field of view at 45 degrees
                 // set viewing range between 0.1 and 100 units away.
-                gl.perspective(45, 0.1, 150.0);
-                gl.identity();
+                gl_perspective(45, 0.1, 150.0);
+                gl_identity();
                 
-                gl.rotate(-camera.pitch, 1, 0, 0);
-                gl.rotate(-camera.yaw, 0, 1, 0);
-                gl.translate(-camera.x, -camera.y, -camera.z);
+                gl_rotate(-camera.pitch, 1, 0, 0);
+                gl_rotate(-camera.yaw, 0, 1, 0);
+                gl_translate(-camera.x, -camera.y, -camera.z);
                 
                 // enable lighting
-                gl.enableLighting();
-                gl.setAmbientLighting(0.5, 0.5, 0.5);
-                gl.setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
+                gl_enableLighting();
+                gl_setAmbientLighting(0.5, 0.5, 0.5);
+                gl_setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
                 
                 view.drawFloor();
                 view.drawWalls();
                 view.drawCeiling();
                 view.drawCrates();
             };
-            
-            window.onload = function(){
-                new Controller();
-            };</script>
-  </body>
-</html>
+var view = new View(),
+    model = new Model();
+
+function c_init() {
+  gl_init();
+  gl_setShaderProgram();
+  c_attachListeners();
+  
+  var sources = {
+    crate: GROUND_TEXTURE_ENCODING,
+    metalFloor: GROUND_TEXTURE_ENCODING,
+    metalWall: GROUND_TEXTURE_ENCODING,
+    ceiling: GROUND_TEXTURE_ENCODING
+  };
+  
+  c_loadTextures(sources, function() {
+    view.stage();
+  });
+}
+
+function c_loadTextures(sources, callback) {
+  var textures = model.textures;
+  var loadedImages = 0;
+  var numImages = 0;
+  for (var src in sources) {
+    (function() {
+      var key = src;
+      numImages++;
+      textures[key] = context.createTexture();
+      textures[key].image = new Image();
+      textures[key].image.onload = function() {
+        gl_initTexture(textures[key]);
+        if (++loadedImages >= numImages) {
+            callback();
+        }
+      };
+      
+      textures[key].image.src = sources[key];
+    })();
+  }
+};
+
+function c_handleKeyDown(evt) {
+  var keycode = ((evt.which) || (evt.keyCode));
+  switch (keycode) {
+    case 37:
+      // left key
+      model.sideMovement = model.LEFT;
+      break;
+    case 38:
+      // up key
+      model.straightMovement = model.FORWARD;
+      break;
+    case 39:
+      // right key
+      model.sideMovement = model.RIGHT;
+      break;
+    case 40:
+      // down key
+      model.straightMovement = model.BACKWARD;
+      break;
+  }
+};
+
+function c_handleKeyUp(evt) {
+  var keycode = ((evt.which) || (evt.keyCode));
+  switch (keycode) {
+    case 37:
+      // left key
+      model.sideMovement = model.STILL;
+      break;
+    case 38:
+      // up key
+      model.straightMovement = model.STILL;
+      break;
+    case 39:
+      // right key
+      model.sideMovement = model.STILL;
+      break;
+    case 40:
+      // down key
+      model.straightMovement = model.STILL;
+      break;
+  }
+};
+
+function c_attachListeners() {
+  document.addEventListener('keydown', function(evt) {
+    c_handleKeyDown(evt);
+  }, false);
+  
+  document.addEventListener('keyup', function(evt) {
+    c_handleKeyUp(evt);
+  }, false);
+};
+
+// initialize game controller
+c_init();
+            })();</script></body></html>
