@@ -133,7 +133,8 @@ function v_render() {
   gl_setAmbientLighting(0.5, 0.5, 0.5);
 
 
-  gl_setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
+  //gl_setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
+  gl_setPointLighting(0.5, 0.5, 0.5);
 
   gl_rotate(-camera.pitch, 1, 0, 0);
   gl_rotate(-camera.yaw, 0, 1, 0);
