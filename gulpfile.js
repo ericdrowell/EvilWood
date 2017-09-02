@@ -11,6 +11,7 @@ var replace = require('gulp-replace');
 var fs = require("fs");
 var size = require('gulp-size');
 var wrap = require("gulp-wrap");
+var cleanCSS = require('gulp-clean-css');
 
 gulp.task('clean', function () {
   return gulp.src('build', {read: false})
@@ -23,7 +24,9 @@ gulp.task('js', function() {
       './src/js/glMatrix.custom.min.js',
       './src/js/globals.js',
       './src/js/webgl.js',
-      './src/js/model.js',
+      './src/js/buffers.js',
+      './src/js/world.js',
+      './src/js/player.js',
       './src/js/view.js',
       './src/js/controller.js'
     ])
@@ -32,13 +35,19 @@ gulp.task('js', function() {
     .pipe(gulp.dest('./tmp'));
 });
 
-gulp.task('html', function() {
-  var MAIN_JS = fs.readFileSync('./tmp/main.js', 'utf8');
-  var GROUND_TEXTURE_ENCODING = fs.readFileSync('./base64Textures/ground.txt', 'utf8');
+gulp.task('css', function() {
+  // for efficiency not using dep management so just manually control concat order
+  return gulp.src('./src/css/main.css')
+    .pipe(gulp.dest('./tmp'));
+});
 
+gulp.task('html', function() {
   return gulp.src(['./src/index.html'])
-    .pipe(replace('{{MAIN_JS}}', MAIN_JS))
-    .pipe(replace('{{GROUND_TEXTURE_ENCODING}}', GROUND_TEXTURE_ENCODING))
+    .pipe(replace('{{JS}}', fs.readFileSync('./tmp/main.js', 'utf8')))
+    .pipe(replace('{{CSS}}', fs.readFileSync('./tmp/main.css', 'utf8')))
+    .pipe(replace('{{LEAVES_ENCODING}}', fs.readFileSync('./base64Textures/leaves.txt', 'utf8')))
+    .pipe(replace('{{TREE_TRUNK_ENCODING}}', fs.readFileSync('./base64Textures/tree-trunk.txt', 'utf8')))
+    .pipe(replace('{{GROUND_ENCODING}}', fs.readFileSync('./base64Textures/ground.txt', 'utf8')))
     .pipe(gulp.dest('./build'));
 });
 
@@ -57,16 +66,22 @@ gulp.task('size', function() {
     .pipe(size())
 });
 
-gulp.task('compress', function () {
+gulp.task('compress-js', function () {
   return gulp.src('./tmp/main.js')
     .pipe(uglify())
     .pipe(gulp.dest('./tmp'))
 });
 
+gulp.task('compress-css', function () {
+  return gulp.src('./tmp/main.css')
+    .pipe(cleanCSS())
+    .pipe(gulp.dest('./tmp'))
+});
+
 gulp.task('default', function() {
-  runSequence('clean', 'js', 'html');
+  runSequence('clean', 'js', 'css', 'html');
 });
 
 gulp.task('prod', function() {
-  runSequence('clean', 'js', 'compress', 'html', 'zip', 'size');
+  runSequence('clean', 'js', 'css','compress-js', 'compress-css', 'html', 'zip', 'size');
 });

@@ -1,4 +1,44 @@
-<!DOCTYPE HTML><html><head><title>Evil Wood</title></head><body><canvas id="scene"></canvas><script>var GROUND_TEXTURE_ENCODING = 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw==';</script><script>(function(){// glMatrix v0.9.5
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Evil Wood</title>
+  <style>html, body {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+canvas {
+  background-color: #1e1e0e;
+}
+
+/* vertical crosshair bar */
+#a {
+  width: 2px;
+  height: 40px;
+  position: fixed;
+  left: 50%;
+  margin-left: -1px;
+  top: 50%;
+  margin-top: -20px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* horizontal crosshair bar */
+#b {
+  width: 40px;
+  height: 2px;
+  position: fixed;
+  left: 50%;
+  margin-left: -20px;
+  top: 50%;
+  margin-top: -1px;
+  background-color: rgba(255, 255, 255, 0.7);
+}</style>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <script>(function(){// glMatrix v0.9.5
 glMatrixArrayType=typeof Float32Array!="undefined"?Float32Array:typeof WebGLFloatArray!="undefined"?WebGLFloatArray:Array;
 var vec3={};
 vec3.create=function(a){var b=new glMatrixArrayType(3);if(a){b[0]=a[0];b[1]=a[1];b[2]=a[2]}return b};
@@ -11,6 +51,7 @@ var mat4={};
 mat4.set=function(a,b){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=a[12];b[13]=a[13];b[14]=a[14];b[15]=a[15];return b};mat4.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=0;a[5]=1;a[6]=0;a[7]=0;a[8]=0;a[9]=0;a[10]=1;a[11]=0;a[12]=0;a[13]=0;a[14]=0;a[15]=1;return a};
 mat4.create=function(a){var b=new glMatrixArrayType(16);if(a){b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[3];b[4]=a[4];b[5]=a[5];b[6]=a[6];b[7]=a[7];b[8]=a[8];b[9]=a[9];b[10]=a[10];b[11]=a[11];b[12]=a[12];b[13]=a[13];b[14]=a[14];b[15]=a[15]}return b};
 mat4.identity=function(a){a[0]=1;a[1]=0;a[2]=0;a[3]=0;a[4]=0;a[5]=1;a[6]=0;a[7]=0;a[8]=0;a[9]=0;a[10]=1;a[11]=0;a[12]=0;a[13]=0;a[14]=0;a[15]=1;return a};
+mat4.toMat3=function(a,b){b||(b=mat3.create());b[0]=a[0];b[1]=a[1];b[2]=a[2];b[3]=a[4];b[4]=a[5];b[5]=a[6];b[6]=a[8];b[7]=a[9];b[8]=a[10];return b};
 mat4.toInverseMat3=function(a,b){var c=a[0],d=a[1],e=a[2],g=a[4],f=a[5],h=a[6],i=a[8],j=a[9],k=a[10],l=k*f-h*j,o=-k*g+h*i,m=j*g-f*i,n=c*l+d*o+e*m;if(!n)return null;n=1/n;b||(b=mat3.create());b[0]=l*n;b[1]=(-k*d+e*j)*n;b[2]=(h*d-e*f)*n;b[3]=o*n;b[4]=(k*c-e*i)*n;b[5]=(-h*c+e*g)*n;b[6]=m*n;b[7]=(-j*c+d*i)*n;b[8]=(f*c-d*g)*n;return b};
 mat4.multiply=function(a,b,c){c||(c=a);var d=a[0],e=a[1],g=a[2],f=a[3],h=a[4],i=a[5],j=a[6],k=a[7],l=a[8],o=a[9],m=a[10],n=a[11],p=a[12],r=a[13],s=a[14];a=a[15];var A=b[0],B=b[1],t=b[2],u=b[3],v=b[4],w=b[5],x=b[6],y=b[7],z=b[8],C=b[9],D=b[10],E=b[11],q=b[12],F=b[13],G=b[14];b=b[15];c[0]=A*d+B*h+t*l+u*p;c[1]=A*e+B*i+t*o+u*r;c[2]=A*g+B*j+t*m+u*s;c[3]=A*f+B*k+t*n+u*a;c[4]=v*d+w*h+x*l+y*p;c[5]=v*e+w*i+x*o+y*r;c[6]=v*g+w*j+x*m+y*s;c[7]=v*f+w*k+x*n+y*a;c[8]=z*d+C*h+D*l+E*p;c[9]=z*e+C*i+D*o+E*r;c[10]=z*
 g+C*j+D*m+E*s;c[11]=z*f+C*k+D*n+E*a;c[12]=q*d+F*h+G*l+b*p;c[13]=q*e+F*i+G*o+b*r;c[14]=q*g+F*j+G*m+b*s;c[15]=q*f+F*k+G*n+b*a;return c};
@@ -21,12 +62,19 @@ v;d[4]=b*w+o*x+r*y;d[5]=f*w+m*x+s*y;d[6]=k*w+n*x+A*y;d[7]=l*w+p*x+B*y;d[8]=b*z+o
 mat4.frustum=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;f[0]=e*2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=e*2/i;f[6]=0;f[7]=0;f[8]=(b+a)/h;f[9]=(d+c)/i;f[10]=-(g+e)/j;f[11]=-1;f[12]=0;f[13]=0;f[14]=-(g*e*2)/j;f[15]=0;return f};
 mat4.perspective=function(a,b,c,d,e){a=c*Math.tan(a*Math.PI/360);b=a*b;return mat4.frustum(-b,b,-a,a,c,d,e)};
 
+var MATH_PI = Math.PI;
+
+// variables
 var canvas = document.getElementById('scene'), 
     context = canvas.getContext('webgl'),
-    shaderProgram = null, 
+    shaderProgram = context.createProgram();
     mvMatrix = mat4.create(), 
     pMatrix = mat4.create(),
-    mvMatrixStack = [];
+    mvMatrixStack = [],
+    
+    buffers = {},
+    textures = {},
+    player = {};
 function gl_init() {
   // init depth test
   context.enable(context.DEPTH_TEST);
@@ -107,8 +155,7 @@ function gl_setShaderProgram() {
   var vertexShader = context.createShader(context.VERTEX_SHADER);
   context.shaderSource(vertexShader, vertexGLSL);
   context.compileShader(vertexShader);
-  
-  shaderProgram = context.createProgram();
+
   context.attachShader(shaderProgram, vertexShader);
   context.attachShader(shaderProgram, fragmentShader);
   context.linkProgram(shaderProgram);
@@ -170,10 +217,10 @@ function gl_initLightingShader() {
   shaderProgram.directionalColorUniform = context.getUniformLocation(shaderProgram, 'uDirectionalColor');
 };
 
-function gl_initTexture(texture) {
+function gl_initTexture(glTexture, image) {
   context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
-  context.bindTexture(context.TEXTURE_2D, texture);
-  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, texture.image);
+  context.bindTexture(context.TEXTURE_2D, glTexture);
+  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
   context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.NEAREST);
   context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR_MIPMAP_NEAREST);
   context.generateMipmap(context.TEXTURE_2D);
@@ -196,31 +243,23 @@ function gl_createElementArrayBuffer(vertices) {
   return buffer;
 };
 
-function gl_pushPositionBuffer(buffers) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.positionBuffer);
+function gl_pushBuffers(buffers, texture) {
+  // position buffers
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.position);
   context.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, context.FLOAT, false, 0, 0);
-};
 
-
-function gl_pushColorBuffer(buffers) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.colorBuffer);
-  context.vertexAttribPointer(shaderProgram.vertexColorAttribute, 4, context.FLOAT, false, 0, 0);
-};
-
-function gl_pushTextureBuffer(buffers, texture) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.textureBuffer);
+  // texture buffers
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.texture);
   context.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, context.FLOAT, false, 0, 0);
   context.activeTexture(context.TEXTURE0);
   context.bindTexture(context.TEXTURE_2D, texture);
   context.uniform1i(shaderProgram.samplerUniform, 0);
-};
 
-function gl_pushIndexBuffer(buffers) {
-  context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
-};
+  // index buffers
+  context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffers.index);
 
-function gl_pushNormalBuffer(buffers) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.normalBuffer);
+  // normal buffers
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.normal);
   context.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, context.FLOAT, false, 0, 0);
 };
 
@@ -238,14 +277,14 @@ function gl_drawElements(buffers) {
   gl_setMatrixUniforms();
   
   // draw elements
-  context.drawElements(context.TRIANGLES, buffers.indexBuffer.numElements, context.UNSIGNED_SHORT, 0);
+  context.drawElements(context.TRIANGLES, buffers.index.numElements, context.UNSIGNED_SHORT, 0);
 };
 
 function l_drawArrays(buffers) {
   gl_setMatrixUniforms();
   
   // draw arrays
-  context.drawArrays(context.TRIANGLES, 0, buffers.positionBuffer.numElements / 3);
+  context.drawArrays(context.TRIANGLES, 0, buffers.position.numElements / 3);
 };
 
 function gl_enableLighting() {
@@ -267,366 +306,329 @@ function gl_setDirectionalLighting(x, y, z, red, green, blue) {
   // directional color
   context.uniform3f(shaderProgram.directionalColorUniform, parseFloat(red), parseFloat(green), parseFloat(blue));
 };
-            /*************************************
-             * Model
-             */
-            function Model() {
-                this.cubeBuffers = {};
-                this.floorBuffers = {};
-                this.wallBuffers = {};
-                this.angle = 0;
-                this.textures = {};
-                this.cratePositions = [];
-                
-                // movements
-                this.STILL = 'STILL';
-                this.FORWARD = 'FORWARD';
-                this.BACKWARD = 'BACKWARD';
-                this.LEFT = 'LEFT';
-                this.RIGHT = 'RIGHT';
-                
-                // camera
-                this.camera = {
-                    x: 0,
-                    y: 1.5,
-                    z: 5,
-                    pitch: 0,
-                    yaw: 0
-                };
-                
-                this.straightMovement = this.STILL;
-                this.sideMovement = this.STILL;
-                this.speed = 8; // units per second 
-                this.initBuffers();
-                this.initCratePositions();
-            }
-            
-            Model.prototype.initCratePositions = function() {
-                var crateRange = 45;
-                // randomize 20 floor crates
-                for (var n = 0; n < 20; n++) {
-                    var cratePos = {};
-                    cratePos.x = (Math.random() * crateRange * 2) - crateRange;
-                    cratePos.y = 0;
-                    cratePos.z = (Math.random() * crateRange * 2) - crateRange;
-                    cratePos.rotationY = Math.random() * Math.PI * 2;
-                    this.cratePositions.push(cratePos);
-                    
-                    if (Math.round(Math.random() * 3) == 3) {
-                        var stackedCratePosition = {};
-                        stackedCratePosition.x = cratePos.x;
-                        stackedCratePosition.y = 2.01;
-                        stackedCratePosition.z = cratePos.z;
-                        stackedCratePosition.rotationY = cratePos.rotationY + ((Math.random() * Math.PI / 8) - Math.PI / 16);
-                        this.cratePositions.push(stackedCratePosition);
-                    }
-                }
-            };
-            
-            Model.prototype.initCubeBuffers = function() {
-                this.cubeBuffers.positionBuffer = gl_createArrayBuffer([    
-                  -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, // Front face    
-                  -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, // Back face    
-                  -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1, // Top face    
-                  -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, // Bottom face    
-                  1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, // Right face    
-                  -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1 // Left face
-        ]);
-                
-                this.cubeBuffers.normalBuffer = gl_createArrayBuffer([    
-                  0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, // Front face    
-                  0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, // Back face   
-                  0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, // Top face    
-                  0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, // Bottom face    
-                  1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // Right face    
-                  -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0 // Left face
-        ]);
-                
-                this.cubeBuffers.textureBuffer = gl_createArrayBuffer([    
-                  0, 0, 1, 0, 1, 1, 0, 1, // Front face   
-                  1, 0, 1, 1, 0, 1, 0, 0, // Back face   
-                  0, 1, 0, 0, 1, 0, 1, 1, // Top face    
-                  1, 1, 0, 1, 0, 0, 1, 0, // Bottom face   
-                  1, 0, 1, 1, 0, 1, 0, 0, // Right face    
-                  0, 0, 1, 0, 1, 1, 0, 1 // Left face
-        ]);
-                
-                this.cubeBuffers.indexBuffer = gl_createElementArrayBuffer([
-          0, 1, 2, 0, 2, 3, // Front face
-                4, 5, 6, 4, 6, 7, // Back face
-                8, 9, 10, 8, 10, 11, // Top face
-                12, 13, 14, 12, 14, 15, // Bottom face
-                16, 17, 18, 16, 18, 19, // Right face
-                20, 21, 22, 20, 22, 23 // Left face
-              ]);
-            };
-            
-            Model.prototype.initFloorBuffers = function() {
-                this.floorBuffers.positionBuffer = gl_createArrayBuffer([
-          -50, 0, -50, -50, 0, 50, 50, 0, 50, 50, 0, -50
-        ]);
-                
-                this.floorBuffers.textureBuffer = gl_createArrayBuffer([
-          0, 25, 0, 0, 25, 0, 25, 25
-        ]);
-                
-                this.floorBuffers.indexBuffer = gl_createElementArrayBuffer([
-          0, 1, 2, 0, 2, 3
-        ]);
-                
-                // floor normal points upwards
-                this.floorBuffers.normalBuffer = gl_createArrayBuffer([
-          0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
-        ]);
-            };
-            
-            Model.prototype.initWallBuffers = function() {
-                this.wallBuffers.positionBuffer = gl_createArrayBuffer([
-          -50, 5, 0, 50, 5, 0, 50, -5, 0, -50, -5, 0
-        ]);
-                
-                this.wallBuffers.textureBuffer = gl_createArrayBuffer([
-          0, 0, 25, 0, 25, 1.5, 0, 1.5
-        ]);
-                
-                this.wallBuffers.indexBuffer = gl_createElementArrayBuffer([
-          0, 1, 2, 0, 2, 3
-        ]);
-                
-                // floor normal points upwards
-                this.wallBuffers.normalBuffer = gl_createArrayBuffer([
-          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1
-        ]);
-            };
-            
-            Model.prototype.initBuffers = function() {
-                this.initCubeBuffers();
-                this.initFloorBuffers();
-                this.initWallBuffers();
-            };
-            
-            Model.prototype.updateCameraPos = function() {
-                if (this.straightMovement != this.STILL) {
-                    var direction = this.straightMovement == this.FORWARD ? -1 : 1;
-                    var distEachFrame = direction * this.speed * 0 / 1000;
-                    this.camera.z += distEachFrame * Math.cos(this.camera.yaw);
-                    this.camera.x += distEachFrame * Math.sin(this.camera.yaw);
-                }
-                
-                if (this.sideMovement != this.STILL) {
-                    var direction = this.sideMovement == this.RIGHT ? 1 : -1;
-                    var distEachFrame = direction * this.speed * 0 / 1000;
-                    this.camera.z += distEachFrame * Math.cos(this.camera.yaw + Math.PI / 2);
-                    this.camera.x += distEachFrame * Math.sin(this.camera.yaw + Math.PI / 2);
-                }
-            };
-            /*************************************
-             * View
-             */
-            function View(){
-                this.canvas = document.getElementById('scene');
-                this.canvas.width = window.innerWidth;
-                this.canvas.height = window.innerHeight;
-            }
-            
-            View.prototype.drawFloor = function(){
-                var floorBuffers = model.floorBuffers;
-                
-                gl_save();
-                gl_translate(0, -1.1, 0);
-                gl_pushPositionBuffer(floorBuffers);
-                gl_pushNormalBuffer(floorBuffers);
-                gl_pushTextureBuffer(floorBuffers, model.textures.metalFloor);
-                gl_pushIndexBuffer(floorBuffers);
-                gl_drawElements(floorBuffers);
-                gl_restore();
-            };
-            
-            View.prototype.drawCeiling = function(){
-                var floorBuffers = model.floorBuffers;
-                
-                gl_save();
-                gl_translate(0, 8.9, 0);
-                // use floor buffers with ceiling texture
-                gl_pushPositionBuffer(floorBuffers);
-                gl_pushNormalBuffer(floorBuffers);
-                gl_pushTextureBuffer(floorBuffers, model.textures.ceiling);
-                gl_pushIndexBuffer(floorBuffers);
-                gl_drawElements(floorBuffers);
-                gl_restore();
-            };
-            
-            View.prototype.drawCrates = function(){
-                var cubeBuffers = model.cubeBuffers;
-                
-                for (var n = 0; n < model.cratePositions.length; n++) {
-                    gl_save();
-                    var cratePos = model.cratePositions[n];
-                    gl_translate(cratePos.x, cratePos.y, cratePos.z);
-                    gl_rotate(cratePos.rotationY, 0, 1, 0);
-                    gl_pushPositionBuffer(cubeBuffers);
-                    gl_pushNormalBuffer(cubeBuffers);
-                    gl_pushTextureBuffer(cubeBuffers, model.textures.crate);
-                    gl_pushIndexBuffer(cubeBuffers);
-                    gl_drawElements(cubeBuffers);
-                    gl_restore();
-                }
-            };
-            
-            View.prototype.drawWalls = function(){
-                var wallBuffers = model.wallBuffers;
-                var metalWallTexture = model.textures.metalWall;
-                
-                gl_save();
-                gl_translate(0, 3.9, -50);
-                gl_pushPositionBuffer(wallBuffers);
-                gl_pushNormalBuffer(wallBuffers);
-                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl_pushIndexBuffer(wallBuffers);
-                gl_drawElements(wallBuffers);
-                gl_restore();
-                
-                gl_save();
-                gl_translate(0, 3.9, 50);
-                gl_rotate(Math.PI, 0, 1, 0);
-                gl_pushPositionBuffer(wallBuffers);
-                gl_pushNormalBuffer(wallBuffers);
-                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl_pushIndexBuffer(wallBuffers);
-                gl_drawElements(wallBuffers);
-                gl_restore();
-                
-                gl_save();
-                gl_translate(50, 3.9, 0);
-                gl_rotate(Math.PI * 1.5, 0, 1, 0);
-                gl_pushPositionBuffer(wallBuffers);
-                gl_pushNormalBuffer(wallBuffers);
-                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl_pushIndexBuffer(wallBuffers);
-                gl_drawElements(wallBuffers);
-                gl_restore();
-                
-                gl_save();
-                gl_translate(-50, 3.9, 0);
-                gl_rotate(Math.PI / 2, 0, 1, 0);
-                gl_pushPositionBuffer(wallBuffers);
-                gl_pushNormalBuffer(wallBuffers);
-                gl_pushTextureBuffer(wallBuffers, metalWallTexture);
-                gl_pushIndexBuffer(wallBuffers);
-                gl_drawElements(wallBuffers);
-                gl_restore();
-            };
-            
-            View.prototype.stage = function(){
-                var camera = model.camera;
-                model.updateCameraPos();
-        
-                gl_clear();
-        
-                // set field of view at 45 degrees
-                // set viewing range between 0.1 and 100 units away.
-                gl_perspective(45, 0.1, 150.0);
-                gl_identity();
-                
-                gl_rotate(-camera.pitch, 1, 0, 0);
-                gl_rotate(-camera.yaw, 0, 1, 0);
-                gl_translate(-camera.x, -camera.y, -camera.z);
-                
-                // enable lighting
-                gl_enableLighting();
-                gl_setAmbientLighting(0.5, 0.5, 0.5);
-                gl_setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
-                
-                view.drawFloor();
-                view.drawWalls();
-                view.drawCeiling();
-                view.drawCrates();
-            };
-var view = new View(),
-    model = new Model();
+buffers = {
+  cube: {
+    position: gl_createArrayBuffer([    
+      -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, // Front face    
+      -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, // Back face    
+      -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1, // Top face    
+      -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, // Bottom face    
+      1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, // Right face    
+      -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1 // Left face
+    ]),
+    normal: gl_createArrayBuffer([    
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, // Front face    
+      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, // Back face   
+      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, // Top face    
+      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, // Bottom face    
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // Right face    
+      -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0 // Left face
+    ]),
+    texture: gl_createArrayBuffer([    
+      0, 0, 1, 0, 1, 1, 0, 1, // Front face   
+      1, 0, 1, 1, 0, 1, 0, 0, // Back face   
+      0, 1, 0, 0, 1, 0, 1, 1, // Top face    
+      1, 1, 0, 1, 0, 0, 1, 0, // Bottom face   
+      1, 0, 1, 1, 0, 1, 0, 0, // Right face    
+      0, 0, 1, 0, 1, 1, 0, 1 // Left face
+    ]),
+    index: gl_createElementArrayBuffer([
+      0, 1, 2, 0, 2, 3, // Front face
+      4, 5, 6, 4, 6, 7, // Back face
+      8, 9, 10, 8, 10, 11, // Top face
+      12, 13, 14, 12, 14, 15, // Bottom face
+      16, 17, 18, 16, 18, 19, // Right face
+      20, 21, 22, 20, 22, 23 // Left face
+    ])
+  },
+  plane: {
+    position: gl_createArrayBuffer([
+      -50, 0, -50, -50, 0, 50, 50, 0, 50, 50, 0, -50
+    ]),
+    normal: gl_createArrayBuffer([
+      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
+    ]),
+    texture: gl_createArrayBuffer([
+      0, 25, 0, 0, 25, 0, 25, 25
+    ]),
+    index: gl_createElementArrayBuffer([
+      0, 1, 2, 0, 2, 3
+    ])
+  },
+  // wall: {
+  //   position: gl_createArrayBuffer([
+  //     -50, 5, 0, 50, 5, 0, 50, -5, 0, -50, -5, 0
+  //   ]),
+  //   normal: gl_createArrayBuffer([
+  //     0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1
+  //   ]),
+  //   texture: gl_createArrayBuffer([
+  //     0, 0, 25, 0, 25, 1.5, 0, 1.5
+  //   ]),
+  //   index: gl_createElementArrayBuffer([
+  //     0, 1, 2, 0, 2, 3
+  //   ])
+  // }
+}
+var world = {};
 
-function c_init() {
-  gl_init();
-  gl_setShaderProgram();
-  c_attachListeners();
-  
-  var sources = {
-    crate: GROUND_TEXTURE_ENCODING,
-    metalFloor: GROUND_TEXTURE_ENCODING,
-    metalWall: GROUND_TEXTURE_ENCODING,
-    ceiling: GROUND_TEXTURE_ENCODING
+function w_init() {
+  // also export window to model for debugging
+  world = {
+    trees: []
   };
+
+  w_inittrees();
+}
+
+function w_inittrees() {
+  var treeRange = 45;
+  // randomize 20 trees
+  for (var n = 0; n < 20; n++) {
+    world.trees.push({
+      x: (Math.random() * treeRange * 2) - treeRange,
+      z: (Math.random() * treeRange * 2) - treeRange,
+      rotationY: Math.random() * Math.PI * 2,
+      height: 10
+    });
+  }
+};
+// constants
+var PLAYER_SPEED = 8; // units / s
+
+function p_init() {
+  player = {
+    straightMovement: 0,
+    sideMovement: 0
+  };
+}
+/*
+ * The view is responsible for the camera, loading textures, and rendering the world model
+ */
+
+var camera,
+    elapsedTime = 0,
+    lastTime = 0;
+
+function v_init() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  camera = {
+    x: 0,
+    y: 1.5,
+    z: 5,
+    pitch: 0,
+    yaw: 0
+  }
   
-  c_loadTextures(sources, function() {
-    view.stage();
+  gl_setShaderProgram();
+  v_loadTextures(function() {
+    v_gameLoop();
+
   });
 }
 
-function c_loadTextures(sources, callback) {
-  var textures = model.textures;
+function v_loadTextures(callback) {
+  textures = {
+    tree: {
+      encoding: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///0RIOz9AOFBRR0REOlNTS1dWPVZVQ0RDNElIOkpJO0pJPFFQQ1RTSFZVTEE/MVFPP1NRQlRSQ1dVRkZDMktINj89MUNBNlBOQUtJPVJQQ1pYS1BNPVFOQF1aS11bUVRQPlFNPVxYR0A+NVpXS15bT2ZjV0pIQEhBJ1hROElEMVtWRF5ZR0pGOFhURlBNQkdFPkA4Hk5GLUA6J0Q+K0hCLjw3J0ZBMVxWQ1NOPkhENz88MlRQQ0lBKkY/KlhPN05IODg0KVNOP1RPQGNdTEA8MUZCNkRANUZCN1lVSV5aTkZDO0c+J0I6JzEsH05GMzYxJE5HNkU/MGhfSVpTQk9JOltUQ2JbSUpFOEZBNVdSRkhEOlpVSUM3HD4zGkg+J0Y8JkxCLEpBLEU9Kz43J0E6Ki4pHktDMTo0JkI7LDs1KEA6LFVNO0dBM1tTQklDNVxUQ1BKPEA7MFZQQlZQQ0Y5Hz0zHz41I1BFLkg+KktCL1lPOkc/L1lQPkY/MTw2KlFJOUdAMj03K0tENlhQQFpSQkZANFhRQ1dQQkM+NFROQjYmCTcpEEAzGzwxHDYsGj4zHzYtHUM5JjMrHU1CLSokGU9EMDoyJDszJU1DMUc+LTcwIz01J1RJNkI6K0Q8LVpQPTUvJFNKOUc/MUE6LUlBM0Y/MlFJOlRMPVVNP1NMP1dQQ0ZBOD0xHSggEzUrGjowHycgFT0zIj40Iz40JEg9K0M5KUA3KEE4KUI5KkxCMlBGNUA4K1FHNz84LFRLPEI7Lz85LzImFT8yH0c5JDMpGkg7J0U5JzUsHkI3JkE2Jkc7KjEpHT81Jko+LUY7KzQsIEg9LVFFNEY9L1ZLOklAMzkyKExDNk9IPk5IPzMnF0I0IUAzITcsHTMpG0s8KEM2JEU4JkE1JTQrH0c7K1JFNDoxJUk/MjstHDkuIT4zJkc8LlFGOCkdDyccEDUsIjYtIzszKlFGOjcnFzgtIjgoGTszLDYmGgAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wAX6OgUzVwhF4qYWMn07VKVBgrAVJJGj5mUAg/GgJNzhJcgHkRUHFN3SxkUVSb4FMtVB52yalgQ7OozIdK0dqg8qKkVihsyPzl+VOjQAw8kJFpq2GgzytUwNuRS0BCQoNcdOO+++LCwphksOLLsGAMkZlYiYJS8SIoy7lyGInIYPWJgC9QGT38aOcIRq5QEKm9k6BlwBg2LKfdohSHxZE8LESsOALFWj9AQCAQi5FlkYEmWGyE0zXCGTZOvFyVMNdEFgk65Kx/wdWNAYdIzbdnseUtiKJw4DlvYLTvEihimGHOgjTuVKh2nVvEErQuGYtsmGK/K4PolzJ0oLpbIyCQzgiFZHERpnAy6FgWekhFuPgXZcYHavC4azAQiJeTXqhMOBAQAOw=='
+    },
+    metalFloor: {
+      encoding: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///2lkZSgmJ29tbjExMlhZXjM0NS8xMj1BQjM3Ny4vLyYsKyMmJVZbWScsKVdcWSwxLCYoJklMSSguJjg9NjM9LjI0MTM4MDM2MR4fHURFQz9GNzM3Li46HkJFPi48GTA+GiEnGDI3Ki8zKTs/NTg6NTY4MzM8Iz9ILzM6JzxCMjU4MDdDITQ6KSowHlJbPywwJERKODEzLTM1Lzo8NkNEQSo4Cio0EjxKGyoyFx0iEkJLLi4xJ0tQQE1QRjtGHjZAHURLMSQpFiAkFBETCxodETE2IysuIjs+Mi8xKRscGDk7M1RWTltcWDE4GTA2HTAzJjI1KDU3Lj0/NkpSKyouGzs/Kzk9Kjg6MEhKQDU5JDk8LCwuIyktFEJHKS0wHCEjFjU4Ji8xJB8gGkhKPVBSRTU6GDE0HiIkFkJFMCwuIDs9LkFDNTc4MSotFDc7Gzc6IldbOjM1Ij5AL0BCMjIzKkVGPklKQltcUywuFSUnEy8xGTM1IVVXPjQ1Kz9ANTQ2GCkqGCkqG0dIODo7JD0+JzY3Izk6JjY3JFRVOywsGjk5JzIyJS8vI0tLOEBAMjg4LSkpIUlJPzo6MyoqJlxcVFNTTCkpJklJRUVFQSQkIktLSCIhETY1I0hHNEE/KEdFLkNCNUA/M1dWSygmEzg1GzUzIUA+LUxKOU1MQk5NREA+LyUkHS0sJUpJQj47KktINzEvJFFOPTs5LV5bSTw6L0ZEN1RSRVRSR1xaTj08Nk5HIj88LC0rITs5L1hVR2FeUFxaUDQzLklIQzIuHTc0KC0rIjY0K15bTlhVSTUzLElHQE9NRjItHDw3Jz06MGplVEZDOWZjWTEsHTArHVdONkVAMVFLOjs3LDQxKFhTRTk2LU5KPk5LQnBuaC4nFkA7LmBcUlFJOD85LGBbUFVSS2BaThsaGG5qYkM6Ky8pH0hBNUNAO0tJRlRSTzcsHUY4JTctID86M2BbVD06NkpGQVBMSDYxLwAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wDXUAghhAuNA12iUIHGTdo4a9ES1OiAIUODB0kiMPAB6ZAWAxDy6JpWiQyaQvgwzXkCJ44KB2WwBcN1zMgZXvGeBXqjCE+PPsVGMWMyJlEbG8tkDYoxwR0xZI5mDFMmZpIZDiNu0WFjgcW8VSVOOLnERMGRLzBWsLliRUSaKRU4bViioYgJAnJugIFS6hQjVzOQkEDma5MEN7MQ1WnBQw0le9mIvLBFrpqxXa/ubeNjKJS8cKyUhPECKJcwVY9qxfpkChw1T7R+rduDpcmGRr3OJfPTTdsfVKngqZM0RE+nRa3qtYNF7504UtnYRbpjZ4cOKQguLEDX7Fs6Qls+uCSQQQMEjgGasnC7BsySOVBAcqTwICgIigKZflDxVs6ZKAFVBAQAOw=='
+    },
+    ceiling: {
+      encoding: 'data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAP///09gF0tXFVNgGUFKF1FcFkBID1hiFUhRE0ZOC0xUD01VEkdNE19oGk9WF1VdDkFGCzc7CjtAC1RbEGFpEzM3ClRaEzg8DU5TFVFWF1NZHEFFFmpwJD9DCjs+C1NYEVNXEk1SEj9CD0pOFnl+JVldHE9TG1daEVteE05REUlMEERHD1xfFUdJE2ltHVRWF0lLFVlcGl9iHFNVG2BjIFZYHVFTH0BBCT0+CT0+DVJUEkhJEFxdFUlKEUxNE11eGFtcGWprHy8wEDQ1ElpbIF9gJSEhAjAwCTg4C0pKD0VFDlNTEUlJDzs7DVdWFFVVFEREFElJFlVVGl1dHVpaHEtLGC0sBUxKElNRFkA/EUJBElBPFkFAEmRiHD08EVNRGUtJF1pYHEpJGUxLGmBeITY0CTAuCUE+DUpHEUZEE1JPF0hGFkhFFkdFF2RhImViI0VDGEZEGlNRIiEfAzMwCExHEDUyCz47Djs4DjIvDFNOFTw5D0xIFURAFE9LGExIF01JGEdDFmRfIFpVHVhTHTUxBzUxCkA7DUI9D0dCEUZBEkE8EUpFFEdCFElEFUE9E1BLGEM+FFNOHDw4Fz44DTs2DjItDElCE0E7E1lRHE9IGUU/F0I9Fjs2FFRNHVJMHU9JHEZBGldRIiUgATkyC0pCDzcxCy4pCiUhCC8qCzEsDFJJGFtSHVdOHE1GHElCG15WI1VNICwmCUM7EVlPGjQuEUtDGTkzEzEsEVNKIGJYJllQIzIqCkE4EUA4FEY9GE1EHEpBGzs0FlVLIFNJIVFIIicgBzMrDDsyEUtAF0tBHVZNKjYtED81E1RHHkc8GkU7G0k/HyAZBiUeCUw+FzMqEE1AGUQ5GkI4HDsyGUk7FjgtEkQ3GEQ5HDwwFCYeDS4lEE9AHUw+HUk9I2BSMjwuEzwvFkk6G08/H0s8IldGK1tILDouHVRCKUo4IVE/LDYoG0ExJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAEAAQAAAI/wBvZIDxI5WFBhgc1GBgwogBAQTwOIlz7pAHJEmW8CBDwgWHARvYaJjhZZA4c6UwRaqyIoeWObFGoRBSwRGrWug0AXkCZQcIWLw2MXkh40sQU48mZdkTJhQVN8DAiCEErcuCP+s4pXnGbhcVLsxoFCLWRpQOG+UYfXgFb5ydFG+KCZIkDFs4da6q+Ukgy1kzR33MXEF16lg7d+mUoYkAiBY1PXzItUr0LV60MNI8SUiCK9MvLIvkZSvV7d01HKC8WTuzxVgwNchyrZrVy5AiX6Rscet0okifQ9OG3VJy51KlZOC0hZgyqkUQRFfgfFLRRNWjNcu29RBRpkSQBxCiHCQYAinGmEZ1jljygaCDLkp5iBQYYUUOHVWqJrBQQOFCICkjBAQAOw=='
+    }
+  };
+
   var loadedImages = 0;
   var numImages = 0;
-  for (var src in sources) {
+  for (var key in textures) {
     (function() {
-      var key = src;
       numImages++;
-      textures[key] = context.createTexture();
-      textures[key].image = new Image();
-      textures[key].image.onload = function() {
-        gl_initTexture(textures[key]);
+      var texture = textures[key];
+      var glTexture = texture.glTexture = context.createTexture();
+      var image = texture.image = new Image();
+      image.onload = function() {
+        gl_initTexture(glTexture, image);
         if (++loadedImages >= numImages) {
-            callback();
+          callback();
         }
       };
       
-      textures[key].image.src = sources[key];
+      image.src = texture.encoding;
     })();
   }
 };
 
+function v_renderFloor() {
+  gl_save();
+  gl_translate(0, -1.1, 0);
+  gl_pushBuffers(buffers.plane, textures.metalFloor.glTexture);
+  gl_drawElements(buffers.plane);
+  gl_restore();
+};
+
+function v_renderCeiling() {
+  gl_save();
+  gl_translate(0, 8.9, 0);
+  // use floor buffers with ceiling texture
+  gl_pushBuffers(buffers.plane, textures.ceiling.glTexture);
+  gl_drawElements(buffers.plane);
+  gl_restore();
+};
+
+function v_renderTrees() {
+  for (var n = 0; n < world.trees.length; n++) {
+    var tree = world.trees[n];
+
+    for (var i = 0; i < tree.height; i++) {
+      gl_save();
+      gl_translate(tree.x, i*2, tree.z);
+      gl_rotate(tree.rotationY, 0, 1, 0);
+      gl_pushBuffers(buffers.cube, textures.tree.glTexture);
+      gl_drawElements(buffers.cube);
+      gl_restore();
+    }
+  }
+};
+
+function v_updateCameraPos() {
+  if (player.straightMovement !== 0) {
+    var direction = player.straightMovement === 1 ? -1 : 1;
+    var distEachFrame = direction * PLAYER_SPEED * elapsedTime / 1000;
+    camera.z += distEachFrame * Math.cos(camera.yaw);
+    camera.x += distEachFrame * Math.sin(camera.yaw);
+  }
+  
+  if (player.sideMovement !== 0) {
+    var direction = player.sideMovement === 1 ? 1 : -1;
+    var distEachFrame = direction * PLAYER_SPEED * elapsedTime / 1000;
+    camera.z += distEachFrame * Math.cos(camera.yaw + Math.PI / 2);
+    camera.x += distEachFrame * Math.sin(camera.yaw + Math.PI / 2);
+  }
+};
+
+function v_gameLoop() {
+  var time = new Date().getTime();
+  if (lastTime !== 0) {
+    elapsedTime = time - lastTime;
+  }
+  v_render();
+
+  lastTime = time;
+
+  window.requestAnimationFrame(v_gameLoop);  
+} 
+
+function v_render() {
+  v_updateCameraPos();
+
+  gl_clear();
+
+  // set field of view at 45 degrees
+  // set viewing range between 0.1 and 100 units away.
+  gl_perspective(45, 0.1, 150.0);
+  gl_identity();
+  
+  // enable lighting
+  gl_enableLighting();
+  gl_setAmbientLighting(0.5, 0.5, 0.5);
+
+
+  gl_setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
+
+  gl_rotate(-camera.pitch, 1, 0, 0);
+  gl_rotate(-camera.yaw, 0, 1, 0);
+  gl_translate(-camera.x, -camera.y, -camera.z);
+  
+  v_renderFloor();
+  v_renderCeiling();
+  v_renderTrees();
+};
+function c_init() {
+  gl_init(); // webgl
+  w_init(); // world
+  p_init(); // player
+  v_init(); // view
+  c_attachListeners();
+}
+
 function c_handleKeyDown(evt) {
   var keycode = ((evt.which) || (evt.keyCode));
-  switch (keycode) {
-    case 37:
-      // left key
-      model.sideMovement = model.LEFT;
-      break;
-    case 38:
-      // up key
-      model.straightMovement = model.FORWARD;
-      break;
-    case 39:
-      // right key
-      model.sideMovement = model.RIGHT;
-      break;
-    case 40:
-      // down key
-      model.straightMovement = model.BACKWARD;
-      break;
+
+  if (c_isPointerLocked()) {
+    switch (keycode) {
+      case 65:
+        // a key
+        player.sideMovement = -1;
+        break;
+      case 87:
+        // w key
+        player.straightMovement = 1;
+        break;
+      case 68:
+        // d key
+        player.sideMovement = 1;
+        break;
+      case 83:
+        // s key
+        player.straightMovement = -1;
+        break;
+    }
   }
 };
 
 function c_handleKeyUp(evt) {
   var keycode = ((evt.which) || (evt.keyCode));
+
   switch (keycode) {
-    case 37:
-      // left key
-      model.sideMovement = model.STILL;
+    case 65:
+      // a key
+      player.sideMovement = 0;
       break;
-    case 38:
-      // up key
-      model.straightMovement = model.STILL;
+    case 87:
+      // w key
+      player.straightMovement = 0;
       break;
-    case 39:
-      // right key
-      model.sideMovement = model.STILL;
+    case 68:
+      // d key
+      player.sideMovement = 0;
       break;
-    case 40:
-      // down key
-      model.straightMovement = model.STILL;
+    case 83:
+      // s key
+      player.straightMovement = 0;
       break;
   }
 };
+
+function c_handleMouseMove(evt) {
+  if (c_isPointerLocked()) {
+    // pitch (up and down)
+    camera.pitch += evt.movementY * MATH_PI * 0.001 * -1;
+    if (camera.pitch > MATH_PI/2) {
+      camera.pitch = MATH_PI/2;
+    }
+    if (camera.pitch < -1 * MATH_PI/2) {
+      camera.pitch = -1 * MATH_PI/2;
+    }
+
+    // yaw (side to side)
+    camera.yaw += evt.movementX * MATH_PI * 0.001 * -1;
+  }
+}
+
+function c_isPointerLocked() {
+  return document.pointerLockElement === canvas;
+}
+
+function c_handleClick(evt) {
+  // if pointer is not locked
+  if (!c_isPointerLocked()) {
+    canvas.requestPointerLock();
+  } 
+}
 
 function c_attachListeners() {
   document.addEventListener('keydown', function(evt) {
@@ -636,8 +638,20 @@ function c_attachListeners() {
   document.addEventListener('keyup', function(evt) {
     c_handleKeyUp(evt);
   }, false);
+
+  document.addEventListener('mousemove', function(evt) {
+    c_handleMouseMove(evt);
+  }, false);
+
+  document.addEventListener('click', function(evt) {
+    c_handleClick(evt);
+  }, false);
 };
 
 // initialize game controller
 c_init();
-            })();</script></body></html>
+})();</script>
+  <div id="a"></div>
+  <div id="b"></div>
+</body>
+</html>

@@ -1,88 +1,85 @@
-var view = new View(),
-    model = new Model();
-
 function c_init() {
-  gl_init();
-  gl_setShaderProgram();
+  gl_init(); // webgl
+  w_init(); // world
+  p_init(); // player
+  v_init(); // view
   c_attachListeners();
-  
-  var sources = {
-    crate: GROUND_TEXTURE_ENCODING,
-    metalFloor: GROUND_TEXTURE_ENCODING,
-    metalWall: GROUND_TEXTURE_ENCODING,
-    ceiling: GROUND_TEXTURE_ENCODING
-  };
-  
-  c_loadTextures(sources, function() {
-    view.stage();
-  });
 }
-
-function c_loadTextures(sources, callback) {
-  var textures = model.textures;
-  var loadedImages = 0;
-  var numImages = 0;
-  for (var src in sources) {
-    (function() {
-      var key = src;
-      numImages++;
-      textures[key] = context.createTexture();
-      textures[key].image = new Image();
-      textures[key].image.onload = function() {
-        gl_initTexture(textures[key]);
-        if (++loadedImages >= numImages) {
-            callback();
-        }
-      };
-      
-      textures[key].image.src = sources[key];
-    })();
-  }
-};
 
 function c_handleKeyDown(evt) {
   var keycode = ((evt.which) || (evt.keyCode));
-  switch (keycode) {
-    case 37:
-      // left key
-      model.sideMovement = model.LEFT;
-      break;
-    case 38:
-      // up key
-      model.straightMovement = model.FORWARD;
-      break;
-    case 39:
-      // right key
-      model.sideMovement = model.RIGHT;
-      break;
-    case 40:
-      // down key
-      model.straightMovement = model.BACKWARD;
-      break;
+
+  if (c_isPointerLocked()) {
+    switch (keycode) {
+      case 65:
+        // a key
+        player.sideMovement = -1;
+        break;
+      case 87:
+        // w key
+        player.straightMovement = 1;
+        break;
+      case 68:
+        // d key
+        player.sideMovement = 1;
+        break;
+      case 83:
+        // s key
+        player.straightMovement = -1;
+        break;
+    }
   }
 };
 
 function c_handleKeyUp(evt) {
   var keycode = ((evt.which) || (evt.keyCode));
+
   switch (keycode) {
-    case 37:
-      // left key
-      model.sideMovement = model.STILL;
+    case 65:
+      // a key
+      player.sideMovement = 0;
       break;
-    case 38:
-      // up key
-      model.straightMovement = model.STILL;
+    case 87:
+      // w key
+      player.straightMovement = 0;
       break;
-    case 39:
-      // right key
-      model.sideMovement = model.STILL;
+    case 68:
+      // d key
+      player.sideMovement = 0;
       break;
-    case 40:
-      // down key
-      model.straightMovement = model.STILL;
+    case 83:
+      // s key
+      player.straightMovement = 0;
       break;
   }
 };
+
+function c_handleMouseMove(evt) {
+  if (c_isPointerLocked()) {
+    // pitch (up and down)
+    camera.pitch += evt.movementY * MATH_PI * 0.001 * -1;
+    if (camera.pitch > MATH_PI/2) {
+      camera.pitch = MATH_PI/2;
+    }
+    if (camera.pitch < -1 * MATH_PI/2) {
+      camera.pitch = -1 * MATH_PI/2;
+    }
+
+    // yaw (side to side)
+    camera.yaw += evt.movementX * MATH_PI * 0.001 * -1;
+  }
+}
+
+function c_isPointerLocked() {
+  return document.pointerLockElement === canvas;
+}
+
+function c_handleClick(evt) {
+  // if pointer is not locked
+  if (!c_isPointerLocked()) {
+    canvas.requestPointerLock();
+  } 
+}
 
 function c_attachListeners() {
   document.addEventListener('keydown', function(evt) {
@@ -92,8 +89,15 @@ function c_attachListeners() {
   document.addEventListener('keyup', function(evt) {
     c_handleKeyUp(evt);
   }, false);
+
+  document.addEventListener('mousemove', function(evt) {
+    c_handleMouseMove(evt);
+  }, false);
+
+  document.addEventListener('click', function(evt) {
+    c_handleClick(evt);
+  }, false);
 };
 
 // initialize game controller
 c_init();
-            

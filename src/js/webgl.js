@@ -78,8 +78,7 @@ function gl_setShaderProgram() {
   var vertexShader = context.createShader(context.VERTEX_SHADER);
   context.shaderSource(vertexShader, vertexGLSL);
   context.compileShader(vertexShader);
-  
-  shaderProgram = context.createProgram();
+
   context.attachShader(shaderProgram, vertexShader);
   context.attachShader(shaderProgram, fragmentShader);
   context.linkProgram(shaderProgram);
@@ -141,10 +140,10 @@ function gl_initLightingShader() {
   shaderProgram.directionalColorUniform = context.getUniformLocation(shaderProgram, 'uDirectionalColor');
 };
 
-function gl_initTexture(texture) {
+function gl_initTexture(glTexture, image) {
   context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
-  context.bindTexture(context.TEXTURE_2D, texture);
-  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, texture.image);
+  context.bindTexture(context.TEXTURE_2D, glTexture);
+  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
   context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.NEAREST);
   context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR_MIPMAP_NEAREST);
   context.generateMipmap(context.TEXTURE_2D);
@@ -167,31 +166,23 @@ function gl_createElementArrayBuffer(vertices) {
   return buffer;
 };
 
-function gl_pushPositionBuffer(buffers) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.positionBuffer);
+function gl_pushBuffers(buffers, texture) {
+  // position buffers
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.position);
   context.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, context.FLOAT, false, 0, 0);
-};
 
-
-function gl_pushColorBuffer(buffers) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.colorBuffer);
-  context.vertexAttribPointer(shaderProgram.vertexColorAttribute, 4, context.FLOAT, false, 0, 0);
-};
-
-function gl_pushTextureBuffer(buffers, texture) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.textureBuffer);
+  // texture buffers
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.texture);
   context.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, context.FLOAT, false, 0, 0);
   context.activeTexture(context.TEXTURE0);
   context.bindTexture(context.TEXTURE_2D, texture);
   context.uniform1i(shaderProgram.samplerUniform, 0);
-};
 
-function gl_pushIndexBuffer(buffers) {
-  context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
-};
+  // index buffers
+  context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffers.index);
 
-function gl_pushNormalBuffer(buffers) {
-  context.bindBuffer(context.ARRAY_BUFFER, buffers.normalBuffer);
+  // normal buffers
+  context.bindBuffer(context.ARRAY_BUFFER, buffers.normal);
   context.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, context.FLOAT, false, 0, 0);
 };
 
@@ -209,14 +200,14 @@ function gl_drawElements(buffers) {
   gl_setMatrixUniforms();
   
   // draw elements
-  context.drawElements(context.TRIANGLES, buffers.indexBuffer.numElements, context.UNSIGNED_SHORT, 0);
+  context.drawElements(context.TRIANGLES, buffers.index.numElements, context.UNSIGNED_SHORT, 0);
 };
 
 function l_drawArrays(buffers) {
   gl_setMatrixUniforms();
   
   // draw arrays
-  context.drawArrays(context.TRIANGLES, 0, buffers.positionBuffer.numElements / 3);
+  context.drawArrays(context.TRIANGLES, 0, buffers.position.numElements / 3);
 };
 
 function gl_enableLighting() {
