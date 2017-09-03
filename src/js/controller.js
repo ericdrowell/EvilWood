@@ -1,3 +1,6 @@
+var elapsedTime = 0;
+var lastTime = 0;
+
 function c_init() {
   gl_init(); // webgl
   w_init(); // world
@@ -98,6 +101,20 @@ function c_attachListeners() {
     c_handleClick(evt);
   }, false);
 };
+
+function c_gameLoop() {
+  var time = new Date().getTime();
+  if (lastTime !== 0) {
+    elapsedTime = time - lastTime;
+  }
+  v_updateCameraPos();
+  w_addBlocks();
+  v_render();
+
+  lastTime = time;
+
+  window.requestAnimationFrame(c_gameLoop);  
+} 
 
 // initialize game controller
 c_init();

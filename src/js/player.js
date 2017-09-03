@@ -1,5 +1,7 @@
 // constants
-var PLAYER_SPEED = 8; // units / s
+var PLAYER_SPEED = 30; // units / s
+
+var player = {};
 
 function p_init() {
   player = {

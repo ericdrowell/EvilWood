@@ -38,7 +38,7 @@ canvas {
 </head>
 <body>
   <canvas id="scene"></canvas>
-  <script>(function(){// glMatrix v0.9.5
+  <script>// glMatrix v0.9.5
 glMatrixArrayType=typeof Float32Array!="undefined"?Float32Array:typeof WebGLFloatArray!="undefined"?WebGLFloatArray:Array;
 var vec3={};
 vec3.create=function(a){var b=new glMatrixArrayType(3);if(a){b[0]=a[0];b[1]=a[1];b[2]=a[2]}return b};
@@ -63,6 +63,7 @@ mat4.frustum=function(a,b,c,d,e,g,f){f||(f=mat4.create());var h=b-a,i=d-c,j=g-e;
 mat4.perspective=function(a,b,c,d,e){a=c*Math.tan(a*Math.PI/360);b=a*b;return mat4.frustum(-b,b,-a,a,c,d,e)};
 
 var MATH_PI = Math.PI;
+var MATH_ROUND = Math.round;
 
 // variables
 var canvas = document.getElementById('scene'), 
@@ -70,11 +71,13 @@ var canvas = document.getElementById('scene'),
     shaderProgram = context.createProgram();
     mvMatrix = mat4.create(), 
     pMatrix = mat4.create(),
-    mvMatrixStack = [],
-    
-    buffers = {},
-    textures = {},
-    player = {};
+    mvMatrixStack = [];
+function u_convertNegZeroToPosZero(val) {
+  if (1/val === -Infinity) {
+    return val * -1;
+  }
+  return val;
+}
 function gl_init() {
   // init depth test
   context.enable(context.DEPTH_TEST);
@@ -98,55 +101,6 @@ function gl_restore() {
   mvMatrix = mvMatrixStack.pop();
 };
 
-function gl_getFragmentShaderGLSL() {
-  return '#ifdef GL_ES\n' +
-    'precision highp float;\n' +
-    '#endif\n' +
-    'varying vec2 vTextureCoord;\n' +
-    'varying vec3 vLightWeighting;\n' +
-    'uniform sampler2D uSampler;\n' +
-    'void main(void) {\n' +
-    'vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n' +
-    'gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n' +
-    '}';
-};
-
-function gl_getVertexShaderGLSL() {
-  return 'attribute vec3 aVertexPosition;\n' +
-    'attribute vec3 aVertexNormal;\n' +
-    'attribute vec2 aTextureCoord;\n' +
-
-    'uniform mat4 uMVMatrix;\n' +
-    'uniform mat4 uPMatrix;\n' +
-    'uniform mat3 uNMatrix;\n' +
-
-    'uniform vec3 uAmbientColor;\n' +
-
-    'uniform vec3 uPointLightingLocation;\n' +
-    'uniform vec3 uPointLightingColor;\n' +
-
-    'uniform bool uUseLighting;\n' +
-
-    'varying vec2 vTextureCoord;\n' +
-    'varying vec3 vLightWeighting;\n' +
-
-    'void main(void) {\n' +
-        'vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);\n' +
-        'gl_Position = uPMatrix * mvPosition;\n' +
-        'vTextureCoord = aTextureCoord;\n' +
-
-        'if (!uUseLighting) {\n' +
-            'vLightWeighting = vec3(1.0, 1.0, 1.0);\n' +
-        '} else {\n' +
-            'vec3 lightDirection = normalize(uPointLightingLocation - mvPosition.xyz);\n' +
-
-            'vec3 transformedNormal = uNMatrix * aVertexNormal;\n' +
-            'float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);\n' +
-            'vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;\n' +
-        '}\n' +
-    '}'
-};
-
 function gl_initShaders() {
   gl_initPositionShader();
   gl_initTextureShader();
@@ -154,10 +108,7 @@ function gl_initShaders() {
   gl_initLightingShader();
 };
 
-function gl_setShaderProgram() {
-  var fragmentGLSL = gl_getFragmentShaderGLSL();
-  var vertexGLSL = gl_getVertexShaderGLSL();
-  
+function gl_setShaderProgram(fragmentGLSL, vertexGLSL) {
   var fragmentShader = context.createShader(context.FRAGMENT_SHADER);
   context.shaderSource(fragmentShader, fragmentGLSL);
   context.compileShader(fragmentShader);
@@ -308,7 +259,58 @@ function gl_setAmbientLighting(red, green, blue) {
 function gl_setPointLighting(red, green, blue) {
   context.uniform3f(shaderProgram.pointLightingColorUniform, red, green, blue);
 }
-buffers = {
+function gl_getFragmentShaderGLSL() {
+  return '#ifdef GL_ES\n' +
+    'precision highp float;\n' +
+    '#endif\n' +
+    'varying vec2 vTextureCoord;\n' +
+    'varying vec3 vLightWeighting;\n' +
+    'uniform sampler2D uSampler;\n' +
+    'void main(void) {\n' +
+        'vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n' +
+        'gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n' +
+    '}';
+};
+
+function gl_getVertexShaderGLSL() {
+  return 'attribute vec3 aVertexPosition;\n' +
+    'attribute vec3 aVertexNormal;\n' +
+    'attribute vec2 aTextureCoord;\n' +
+
+    'uniform mat4 uMVMatrix;\n' +
+    'uniform mat4 uPMatrix;\n' +
+    'uniform mat3 uNMatrix;\n' +
+
+    'uniform vec3 uAmbientColor;\n' +
+
+    'uniform vec3 uPointLightingLocation;\n' +
+    'uniform vec3 uPointLightingColor;\n' +
+
+    'uniform bool uUseLighting;\n' +
+
+    'varying vec2 vTextureCoord;\n' +
+    'varying vec3 vLightWeighting;\n' +
+
+    'void main(void) {\n' +
+        'vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);\n' +
+        'gl_Position = uPMatrix * mvPosition;\n' +
+        'vTextureCoord = aTextureCoord;\n' +
+
+        'if (!uUseLighting) {\n' +
+            'vLightWeighting = vec3(1.0, 1.0, 1.0);\n' +
+        '} else {\n' +
+            'vec3 lightDirection = normalize(uPointLightingLocation - mvPosition.xyz);\n' +
+
+            'vec3 transformedNormal = uNMatrix * aVertexNormal;\n' +
+            'float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);\n' +
+            'vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;\n' +
+        '}\n' +
+    '}'
+};
+// block width and height.  The world is made up of equal sized tiled blocks
+var BLOCK_SIZE = 100;
+
+var buffers = {
   cube: {
     position: gl_createArrayBuffer([    
       -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, // Front face    
@@ -356,47 +358,83 @@ buffers = {
     index: gl_createElementArrayBuffer([
       0, 1, 2, 0, 2, 3
     ])
-  },
-  // wall: {
-  //   position: gl_createArrayBuffer([
-  //     -50, 5, 0, 50, 5, 0, 50, -5, 0, -50, -5, 0
-  //   ]),
-  //   normal: gl_createArrayBuffer([
-  //     0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1
-  //   ]),
-  //   texture: gl_createArrayBuffer([
-  //     0, 0, 25, 0, 25, 1.5, 0, 1.5
-  //   ]),
-  //   index: gl_createElementArrayBuffer([
-  //     0, 1, 2, 0, 2, 3
-  //   ])
-  // }
+  }
 }
-var world = {};
+var world = {
+  blocks: {}
+};
 
 function w_init() {
-  // also export window to model for debugging
-  world = {
-    trees: []
-  };
-
-  w_inittrees();
+  w_addBlock(0, 0);
+  w_addBlocks();
 }
 
-function w_inittrees() {
+function w_addBlock(x, z) {
+  if (world.blocks[x] === undefined) {
+    world.blocks[x] = {};
+  }
+
+  world.blocks[x][z] = {
+    trees: []
+  }
+
   var treeRange = 45;
   // randomize 20 trees
   for (var n = 0; n < 20; n++) {
-    world.trees.push({
+    world.blocks[x][z].trees.push({
       x: (Math.random() * treeRange * 2) - treeRange,
       z: (Math.random() * treeRange * 2) - treeRange,
       rotationY: Math.random() * Math.PI * 2,
       height: 10
     });
   }
-};
+}
+
+/*
+ *     -
+ *   1 2 3
+ * - 8 0 4 +
+ *   7 6 5 
+ *     +
+ */ 
+function w_getSurroundingBlocks() {
+  var x = u_convertNegZeroToPosZero(MATH_ROUND(camera.x/BLOCK_SIZE));
+  var z = u_convertNegZeroToPosZero(MATH_ROUND(camera.z/BLOCK_SIZE));
+
+  return [
+    {x: x, z: z}, // 0
+    {x: x-1, z: z-1}, // 1
+    {x: x, z: z-1}, // 2
+    {x: x+1, z: z-1}, // 3
+    {x: x+1, z: z}, // 4
+    {x: x+1, z: z+1}, // 5
+    {x: x, z: z+1}, // 6
+    {x: x-1, z: z+1}, // 7
+    {x: x-1, z: z} // 8
+  ];
+}
+   
+function w_addBlocks() {
+  var blocks = w_getSurroundingBlocks();
+
+  blocks.forEach(function(block) {
+    var bx = block.x;
+    var bz = block.z;
+
+    if (world.blocks[bx] === undefined) {
+      world.blocks[bx] = {};
+    }
+
+    if (world.blocks[bx][bz] === undefined) {
+      w_addBlock(bx, bz);
+    }
+  });
+}
+
 // constants
-var PLAYER_SPEED = 8; // units / s
+var PLAYER_SPEED = 30; // units / s
+
+var player = {};
 
 function p_init() {
   player = {
@@ -408,25 +446,23 @@ function p_init() {
  * The view is responsible for the camera, loading textures, and rendering the world model
  */
 
-var camera,
-    elapsedTime = 0,
-    lastTime = 0;
+var camera = {
+  x: 0,
+  y: 1.5,
+  z: 0,
+  pitch: 0,
+  yaw: 0
+};
+var textures = {};
 
 function v_init() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-
-  camera = {
-    x: 0,
-    y: 1.5,
-    z: 5,
-    pitch: 0,
-    yaw: 0
-  }
   
-  gl_setShaderProgram();
+  gl_setShaderProgram(gl_getFragmentShaderGLSL(), gl_getVertexShaderGLSL());
+
   v_loadTextures(function() {
-    v_gameLoop();
+    c_gameLoop();
 
   });
 }
@@ -464,30 +500,32 @@ function v_loadTextures(callback) {
   }
 };
 
-function v_renderFloor() {
+function v_renderGround(x, z) {
   gl_save();
-  gl_translate(0, -1.1, 0);
+  gl_translate(x * BLOCK_SIZE, -1.1, z * BLOCK_SIZE);
   gl_pushBuffers(buffers.plane, textures.metalFloor.glTexture);
   gl_drawElements(buffers.plane);
   gl_restore();
 };
 
-function v_renderCeiling() {
+function v_renderTreeTops(x, z) {
   gl_save();
-  gl_translate(0, 8.9, 0);
+  gl_translate(x * BLOCK_SIZE, 8.9, z * BLOCK_SIZE);
   // use floor buffers with ceiling texture
   gl_pushBuffers(buffers.plane, textures.ceiling.glTexture);
   gl_drawElements(buffers.plane);
   gl_restore();
 };
 
-function v_renderTrees() {
-  for (var n = 0; n < world.trees.length; n++) {
-    var tree = world.trees[n];
+function v_renderTrees(x, z) {
+  var trees = world.blocks[x][z].trees;
+
+  for (var n = 0; n < trees.length; n++) {
+    var tree = trees[n];
 
     for (var i = 0; i < tree.height; i++) {
       gl_save();
-      gl_translate(tree.x, i*2, tree.z);
+      gl_translate((x * BLOCK_SIZE) + tree.x, i*2, (z * BLOCK_SIZE) + tree.z);
       gl_rotate(tree.rotationY, 0, 1, 0);
       gl_pushBuffers(buffers.cube, textures.tree.glTexture);
       gl_drawElements(buffers.cube);
@@ -495,6 +533,19 @@ function v_renderTrees() {
     }
   }
 };
+
+function v_renderBlocks() {
+  // only render blocks potentially within view
+  var blocks = w_getSurroundingBlocks();
+
+  blocks.forEach(function(block) {
+    var x = block.x;
+    var z = block.z;
+    v_renderGround(x, z);
+    v_renderTrees(x, z);
+    v_renderTreeTops(x, z);
+  });
+}
 
 function v_updateCameraPos() {
   if (player.straightMovement !== 0) {
@@ -510,23 +561,11 @@ function v_updateCameraPos() {
     camera.z += distEachFrame * Math.cos(camera.yaw + Math.PI / 2);
     camera.x += distEachFrame * Math.sin(camera.yaw + Math.PI / 2);
   }
+
+  
 };
 
-function v_gameLoop() {
-  var time = new Date().getTime();
-  if (lastTime !== 0) {
-    elapsedTime = time - lastTime;
-  }
-  v_render();
-
-  lastTime = time;
-
-  window.requestAnimationFrame(v_gameLoop);  
-} 
-
 function v_render() {
-  v_updateCameraPos();
-
   gl_clear();
 
   // set field of view at 45 degrees
@@ -546,10 +585,11 @@ function v_render() {
   gl_rotate(-camera.yaw, 0, 1, 0);
   gl_translate(-camera.x, -camera.y, -camera.z);
   
-  v_renderFloor();
-  v_renderCeiling();
-  v_renderTrees();
+  v_renderBlocks();
 };
+var elapsedTime = 0;
+var lastTime = 0;
+
 function c_init() {
   gl_init(); // webgl
   w_init(); // world
@@ -651,9 +691,23 @@ function c_attachListeners() {
   }, false);
 };
 
+function c_gameLoop() {
+  var time = new Date().getTime();
+  if (lastTime !== 0) {
+    elapsedTime = time - lastTime;
+  }
+  v_updateCameraPos();
+  w_addBlocks();
+  v_render();
+
+  lastTime = time;
+
+  window.requestAnimationFrame(c_gameLoop);  
+} 
+
 // initialize game controller
 c_init();
-})();</script>
+</script>
   <div id="a"></div>
   <div id="b"></div>
 </body>

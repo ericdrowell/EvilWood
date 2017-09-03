@@ -2,25 +2,23 @@
  * The view is responsible for the camera, loading textures, and rendering the world model
  */
 
-var camera,
-    elapsedTime = 0,
-    lastTime = 0;
+var camera = {
+  x: 0,
+  y: 1.5,
+  z: 0,
+  pitch: 0,
+  yaw: 0
+};
+var textures = {};
 
 function v_init() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-
-  camera = {
-    x: 0,
-    y: 1.5,
-    z: 5,
-    pitch: 0,
-    yaw: 0
-  }
   
-  gl_setShaderProgram();
+  gl_setShaderProgram(gl_getFragmentShaderGLSL(), gl_getVertexShaderGLSL());
+
   v_loadTextures(function() {
-    v_gameLoop();
+    c_gameLoop();
 
   });
 }
@@ -58,30 +56,32 @@ function v_loadTextures(callback) {
   }
 };
 
-function v_renderFloor() {
+function v_renderGround(x, z) {
   gl_save();
-  gl_translate(0, -1.1, 0);
+  gl_translate(x * BLOCK_SIZE, -1.1, z * BLOCK_SIZE);
   gl_pushBuffers(buffers.plane, textures.metalFloor.glTexture);
   gl_drawElements(buffers.plane);
   gl_restore();
 };
 
-function v_renderCeiling() {
+function v_renderTreeTops(x, z) {
   gl_save();
-  gl_translate(0, 8.9, 0);
+  gl_translate(x * BLOCK_SIZE, 8.9, z * BLOCK_SIZE);
   // use floor buffers with ceiling texture
   gl_pushBuffers(buffers.plane, textures.ceiling.glTexture);
   gl_drawElements(buffers.plane);
   gl_restore();
 };
 
-function v_renderTrees() {
-  for (var n = 0; n < world.trees.length; n++) {
-    var tree = world.trees[n];
+function v_renderTrees(x, z) {
+  var trees = world.blocks[x][z].trees;
+
+  for (var n = 0; n < trees.length; n++) {
+    var tree = trees[n];
 
     for (var i = 0; i < tree.height; i++) {
       gl_save();
-      gl_translate(tree.x, i*2, tree.z);
+      gl_translate((x * BLOCK_SIZE) + tree.x, i*2, (z * BLOCK_SIZE) + tree.z);
       gl_rotate(tree.rotationY, 0, 1, 0);
       gl_pushBuffers(buffers.cube, textures.tree.glTexture);
       gl_drawElements(buffers.cube);
@@ -89,6 +89,19 @@ function v_renderTrees() {
     }
   }
 };
+
+function v_renderBlocks() {
+  // only render blocks potentially within view
+  var blocks = w_getSurroundingBlocks();
+
+  blocks.forEach(function(block) {
+    var x = block.x;
+    var z = block.z;
+    v_renderGround(x, z);
+    v_renderTrees(x, z);
+    v_renderTreeTops(x, z);
+  });
+}
 
 function v_updateCameraPos() {
   if (player.straightMovement !== 0) {
@@ -104,23 +117,11 @@ function v_updateCameraPos() {
     camera.z += distEachFrame * Math.cos(camera.yaw + Math.PI / 2);
     camera.x += distEachFrame * Math.sin(camera.yaw + Math.PI / 2);
   }
+
+  
 };
 
-function v_gameLoop() {
-  var time = new Date().getTime();
-  if (lastTime !== 0) {
-    elapsedTime = time - lastTime;
-  }
-  v_render();
-
-  lastTime = time;
-
-  window.requestAnimationFrame(v_gameLoop);  
-} 
-
 function v_render() {
-  v_updateCameraPos();
-
   gl_clear();
 
   // set field of view at 45 degrees
@@ -140,7 +141,5 @@ function v_render() {
   gl_rotate(-camera.yaw, 0, 1, 0);
   gl_translate(-camera.x, -camera.y, -camera.z);
   
-  v_renderFloor();
-  v_renderCeiling();
-  v_renderTrees();
+  v_renderBlocks();
 };

@@ -1,4 +1,7 @@
-buffers = {
+// block width and height.  The world is made up of equal sized tiled blocks
+var BLOCK_SIZE = 100;
+
+var buffers = {
   cube: {
     position: gl_createArrayBuffer([    
       -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, // Front face    
@@ -46,19 +49,5 @@ buffers = {
     index: gl_createElementArrayBuffer([
       0, 1, 2, 0, 2, 3
     ])
-  },
-  // wall: {
-  //   position: gl_createArrayBuffer([
-  //     -50, 5, 0, 50, 5, 0, 50, -5, 0, -50, -5, 0
-  //   ]),
-  //   normal: gl_createArrayBuffer([
-  //     0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1
-  //   ]),
-  //   texture: gl_createArrayBuffer([
-  //     0, 0, 25, 0, 25, 1.5, 0, 1.5
-  //   ]),
-  //   index: gl_createElementArrayBuffer([
-  //     0, 1, 2, 0, 2, 3
-  //   ])
-  // }
+  }
 }

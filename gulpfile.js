@@ -23,7 +23,9 @@ gulp.task('js', function() {
   return gulp.src([
       './src/js/glMatrix.custom.min.js',
       './src/js/globals.js',
+      './src/js/utils.js',
       './src/js/webgl.js',
+      './src/js/shaders.js',
       './src/js/buffers.js',
       './src/js/world.js',
       './src/js/player.js',
@@ -31,7 +33,7 @@ gulp.task('js', function() {
       './src/js/controller.js'
     ])
     .pipe(concat('main.js'))
-    .pipe(wrap('(function(){<%= contents %>})();', {}, { parse: false }))
+    //.pipe(wrap('(function(){<%= contents %>})();', {}, { parse: false }))
     .pipe(gulp.dest('./tmp'));
 });
 

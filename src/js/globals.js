@@ -1,4 +1,5 @@
 var MATH_PI = Math.PI;
+var MATH_ROUND = Math.round;
 
 // variables
 var canvas = document.getElementById('scene'), 
@@ -6,8 +7,4 @@ var canvas = document.getElementById('scene'),
     shaderProgram = context.createProgram();
     mvMatrix = mat4.create(), 
     pMatrix = mat4.create(),
-    mvMatrixStack = [],
-    
-    buffers = {},
-    textures = {},
-    player = {};
+    mvMatrixStack = [];
