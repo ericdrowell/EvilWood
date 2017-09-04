@@ -1,3 +1,7 @@
+var mvMatrix = mat4.create(); 
+var pMatrix = mat4.create();
+var mvMatrixStack = [];
+
 function gl_init() {
   // init depth test
   context.enable(context.DEPTH_TEST);
@@ -65,6 +69,10 @@ function gl_translate(x, y, z) {
 
 function gl_rotate(angle, x, y, z) {
   mat4.rotate(mvMatrix, angle, [x, y, z]);
+};
+
+function gl_scale(x, y, z) {
+  mat4.scale(mvMatrix, [x, y, z]);
 };
 
 function gl_initPositionShader() {

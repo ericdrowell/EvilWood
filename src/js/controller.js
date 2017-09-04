@@ -6,6 +6,7 @@ function c_init() {
   w_init(); // world
   p_init(); // player
   v_init(); // view
+  a_init(); // audio
   c_attachListeners();
 }
 
@@ -29,6 +30,10 @@ function c_handleKeyDown(evt) {
       case 83:
         // s key
         player.straightMovement = -1;
+        break;
+      case 32:
+        // space key
+        player.isClimbing = true;
         break;
     }
   }

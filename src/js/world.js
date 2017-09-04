@@ -17,13 +17,12 @@ function w_addBlock(x, z) {
   }
 
   var treeRange = 45;
-  // randomize 20 trees
   for (var n = 0; n < 20; n++) {
     world.blocks[x][z].trees.push({
-      x: (Math.random() * treeRange * 2) - treeRange,
-      z: (Math.random() * treeRange * 2) - treeRange,
-      rotationY: Math.random() * Math.PI * 2,
-      height: 10
+      x: (MATH_RANDOM() * treeRange * 2) - treeRange,
+      z: (MATH_RANDOM() * treeRange * 2) - treeRange,
+      rotationY: MATH_RANDOM() * MATH_PI * 2,
+      height: 60 + MATH_RANDOM() * 80
     });
   }
 }
@@ -67,4 +66,8 @@ function w_addBlocks() {
       w_addBlock(bx, bz);
     }
   });
+}
+
+function w_isNearTree() {
+  return true;
 }
