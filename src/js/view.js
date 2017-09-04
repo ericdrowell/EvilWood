@@ -93,62 +93,62 @@ function v_renderTrees(x, z) {
       gl_restore();
     }
 
-    // bottom level leaves
-    gl_save();
-    gl_translate(treeX, tree.height*0.4, treeY);
-    gl_rotate(tree.rotationY, 0, 1, 0);
-    gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    gl_drawElements(buffers.smallPlane);
-    gl_restore();
+    // // bottom level leaves
+    // gl_save();
+    // gl_translate(treeX, tree.height*0.4, treeY);
+    // gl_rotate(tree.rotationY, 0, 1, 0);
+    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
+    // gl_drawElements(buffers.smallPlane);
+    // gl_restore();
 
-    gl_save();
-    gl_translate(treeX, tree.height*0.5, treeY);
-    gl_rotate(tree.rotationY, 0, 1, 0);
-    gl_scale(0.6, 1, 0.6);
-    gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    gl_drawElements(buffers.smallPlane);
-    gl_restore();
+    // gl_save();
+    // gl_translate(treeX, tree.height*0.5, treeY);
+    // gl_rotate(tree.rotationY, 0, 1, 0);
+    // gl_scale(0.6, 1, 0.6);
+    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
+    // gl_drawElements(buffers.smallPlane);
+    // gl_restore();
 
-    gl_save();
-    gl_translate(treeX, tree.height*0.6, treeY);
-    gl_rotate(tree.rotationY, 0, 1, 0);
-    gl_scale(0.5, 1, 0.5);
-    gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    gl_drawElements(buffers.smallPlane);
-    gl_restore();
+    // gl_save();
+    // gl_translate(treeX, tree.height*0.6, treeY);
+    // gl_rotate(tree.rotationY, 0, 1, 0);
+    // gl_scale(0.5, 1, 0.5);
+    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
+    // gl_drawElements(buffers.smallPlane);
+    // gl_restore();
 
-    gl_save();
-    gl_translate(treeX, tree.height*0.7, treeY);
-    gl_rotate(tree.rotationY, 0, 1, 0);
-    gl_scale(0.4, 1, 0.4);
-    gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    gl_drawElements(buffers.smallPlane);
-    gl_restore();
+    // gl_save();
+    // gl_translate(treeX, tree.height*0.7, treeY);
+    // gl_rotate(tree.rotationY, 0, 1, 0);
+    // gl_scale(0.4, 1, 0.4);
+    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
+    // gl_drawElements(buffers.smallPlane);
+    // gl_restore();
 
-    gl_save();
-    gl_translate(treeX, tree.height*0.8, treeY);
-    gl_rotate(tree.rotationY, 0, 1, 0);
-    gl_scale(0.3, 1, 0.3);
-    gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    gl_drawElements(buffers.smallPlane);
-    gl_restore();
+    // gl_save();
+    // gl_translate(treeX, tree.height*0.8, treeY);
+    // gl_rotate(tree.rotationY, 0, 1, 0);
+    // gl_scale(0.3, 1, 0.3);
+    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
+    // gl_drawElements(buffers.smallPlane);
+    // gl_restore();
 
-    gl_save();
-    gl_translate(treeX, tree.height*0.9, treeY);
-    gl_rotate(tree.rotationY, 0, 1, 0);
-    gl_scale(0.2, 1, 0.2);
-    gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    gl_drawElements(buffers.smallPlane);
-    gl_restore();
+    // gl_save();
+    // gl_translate(treeX, tree.height*0.9, treeY);
+    // gl_rotate(tree.rotationY, 0, 1, 0);
+    // gl_scale(0.2, 1, 0.2);
+    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
+    // gl_drawElements(buffers.smallPlane);
+    // gl_restore();
 
-    // top level leaves
-    gl_save();
-    gl_translate(treeX, tree.height*0.98, treeY);
-    gl_rotate(tree.rotationY, 0, 1, 0);
-    gl_scale(0.1, 1, 0.1);
-    gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    gl_drawElements(buffers.smallPlane);
-    gl_restore();
+    // // top level leaves
+    // gl_save();
+    // gl_translate(treeX, tree.height*0.98, treeY);
+    // gl_rotate(tree.rotationY, 0, 1, 0);
+    // gl_scale(0.1, 1, 0.1);
+    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
+    // gl_drawElements(buffers.smallPlane);
+    // gl_restore();
   }
 };
 

@@ -50,18 +50,18 @@ var buffers = {
       0, 1, 2, 0, 2, 3
     ])
   },
-  smallPlane: {
-    position: gl_createArrayBuffer([
-      -20, 0, -20, -20, 0, 20, 20, 0, 20, 20, 0, -20
-    ]),
-    normal: gl_createArrayBuffer([
-      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
-    ]),
-    texture: gl_createArrayBuffer([
-      0, 10, 0, 0, 10, 0, 10, 10
-    ]),
-    index: gl_createElementArrayBuffer([
-      0, 1, 2, 0, 2, 3
-    ])
-  }
+  // smallPlane: {
+  //   position: gl_createArrayBuffer([
+  //     -20, 0, -20, -20, 0, 20, 20, 0, 20, 20, 0, -20
+  //   ]),
+  //   normal: gl_createArrayBuffer([
+  //     0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
+  //   ]),
+  //   texture: gl_createArrayBuffer([
+  //     0, 10, 0, 0, 10, 0, 10, 10
+  //   ]),
+  //   index: gl_createElementArrayBuffer([
+  //     0, 1, 2, 0, 2, 3
+  //   ])
+  // }
 }
