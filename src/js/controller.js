@@ -1,5 +1,6 @@
 var elapsedTime = 0;
 var lastTime = 0;
+var gameState = 'menu';
 
 function c_init() {
   gl_init(); // webgl
@@ -13,30 +14,39 @@ function c_init() {
 function c_handleKeyDown(evt) {
   var keycode = ((evt.which) || (evt.keyCode));
 
-  if (c_isPointerLocked()) {
-    switch (keycode) {
-      case 65:
-        // a key
+  switch (keycode) {
+    case 65:
+      // a key
+      if (gameState === 'playing') {
         player.sideMovement = -1;
-        break;
-      case 87:
-        // w key
+      }
+      break;
+    case 87:
+      // w key
+      if (gameState === 'playing') {
         player.straightMovement = 1;
-        break;
-      case 68:
-        // d key
+      }
+      break;
+    case 68:
+      // d key
+      if (gameState === 'playing') {
         player.sideMovement = 1;
-        break;
-      case 83:
-        // s key
+      }
+      break;
+    case 83:
+      // s key
+      if (gameState === 'playing') {
         player.straightMovement = -1;
-        break;
-      case 32:
-        // space key
+      }
+      break;
+    case 32:
+      // space key
+      if (gameState === 'playing') {
         player.isClimbing = true;
-        break;
-    }
+      }
+      break;
   }
+  
 };
 
 function c_handleKeyUp(evt) {
@@ -84,9 +94,21 @@ function c_isPointerLocked() {
 
 function c_handleClick(evt) {
   // if pointer is not locked
-  if (!c_isPointerLocked()) {
-    canvas.requestPointerLock();
+  if (gameState === 'menu' || gameState === 'paused') {
+    c_playGame();
+    
   } 
+}
+
+function c_playGame() {
+  gameState = 'playing';
+  canvas.requestPointerLock();
+  a_playMusic('play');
+}
+
+function c_pauseGame() {
+  gameState = 'paused';
+  a_playMusic('menu');
 }
 
 function c_attachListeners() {
@@ -104,6 +126,12 @@ function c_attachListeners() {
 
   document.addEventListener('click', function(evt) {
     c_handleClick(evt);
+  }, false);
+
+  document.addEventListener('pointerlockchange', function(evt) {
+    if (!c_isPointerLocked() && gameState === 'playing') {
+      c_pauseGame();
+    }
   }, false);
 };
 

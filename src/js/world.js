@@ -1,10 +1,55 @@
+var TREES_PER_BLOCK = 20;
+var MONSTERS_PER_BLOCK = 1;
+
+/*
+ x  0  1  2  x
+ 3  4  5  6  7
+ 8  9  20 10 11
+ 12 13 14 15 16
+ x  17 18 19 x
+*/
+var LEAVES_GEOMETRY = [
+  [-1, -2, -2], // 0
+  [0, -2, -2], // 1
+  [1, -2, -2], // 2
+  [-2, -1, -2], // 3
+  [-1, -1, -1], // 4
+  [0, -1, -1], // 5
+  [1, -1, -1], // 6
+  [2, -1, -2], // 7
+  [-2, 0, -2], // 8
+  [-1, 0, -1], // 9
+  [1, 0, -1], // 10
+  [2, 0, -2], // 11
+  [-2, 1, -2], // 12
+  [-1, 1, -1], // 13
+  [0, 1, -1], // 14
+  [1, 1, -1], // 15
+  [2, 1, -2], // 16
+  [-1, 2, -2], // 17
+  [0, 2, -2], // 18
+  [1, 2, -2], // 19
+  [0, 0, 0], // 20
+];
+
 var world = {
-  blocks: {}
+  blocks: {},
+  beacon: {},
+  monsters: []
 };
 
 function w_init() {
   w_addBlock(0, 0);
   w_addBlocks();
+  w_addBeacon();
+}
+
+function w_addBeacon() {
+  world.beacon = {
+    x: 0,
+    z: -100,
+    rotationY: 0
+  }
 }
 
 function w_addBlock(x, z) {
@@ -16,13 +61,21 @@ function w_addBlock(x, z) {
     trees: []
   }
 
-  var treeRange = 45;
-  for (var n = 0; n < 20; n++) {
+  // add trees
+  for (var n = 0; n < TREES_PER_BLOCK; n++) {
     world.blocks[x][z].trees.push({
-      x: (MATH_RANDOM() * treeRange * 2) - treeRange,
-      z: (MATH_RANDOM() * treeRange * 2) - treeRange,
+      x: (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2,
+      z: (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2,
       rotationY: MATH_RANDOM() * MATH_PI * 2,
-      height: 60 + MATH_RANDOM() * 80
+      height: 60 + MATH_RANDOM() * 60
+    });
+  }
+
+  // add monsters
+  for (var n = 0; n < MONSTERS_PER_BLOCK; n++) {
+    world.monsters.push({
+      x: (x * BLOCK_SIZE) + (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2,
+      z: (z * BLOCK_SIZE) + (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2
     });
   }
 }

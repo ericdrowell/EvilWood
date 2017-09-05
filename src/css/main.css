@@ -5,7 +5,7 @@ html, body {
 }
 
 canvas {
-  background-color: #1e1e0e;
+  background-color: black;
 }
 
 /* vertical crosshair bar */
@@ -17,7 +17,7 @@ canvas {
   margin-left: -1px;
   top: 50%;
   margin-top: -20px;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* horizontal crosshair bar */
@@ -29,5 +29,5 @@ canvas {
   margin-left: -20px;
   top: 50%;
   margin-top: -1px;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.3);
 }

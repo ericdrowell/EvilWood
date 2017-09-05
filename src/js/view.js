@@ -28,13 +28,22 @@ function v_init() {
 function v_loadTextures(callback) {
   textures = {
     tree: {
-      encoding: '{{TREE_TRUNK_ENCODING}}'
+      encoding: '{{TREE_ENCODING}}'
     },
-    metalFloor: {
+    ground: {
       encoding: '{{GROUND_ENCODING}}'
     },
-    ceiling: {
+    leaves: {
       encoding: '{{LEAVES_ENCODING}}'
+    },
+    beacon: {
+      encoding: '{{BEACON_ENCODING}}'
+    },
+    shadow: {
+      encoding: '{{SHADOW_ENCODING}}'
+    },
+    monster: {
+      encoding: '{{MONSTER_ENCODING}}'
     }
   };
 
@@ -58,19 +67,59 @@ function v_loadTextures(callback) {
   }
 };
 
+function v_renderBeacon() {
+  var beacon = world.beacon;
+
+  gl_save();
+  gl_translate(beacon.x, 6, beacon.z);
+  gl_pushBuffers(buffers.cube, textures.beacon.glTexture);
+  gl_drawElements(buffers.cube);
+  gl_restore();
+
+  gl_save();
+  gl_translate(beacon.x, -1.99, beacon.z);
+  gl_pushBuffers(buffers.cube, textures.shadow.glTexture);
+  gl_drawElements(buffers.cube);
+  gl_restore();
+}
+
+function v_renderMonsters() {
+  world.monsters.forEach(function(monster) {
+    gl_save();
+    gl_translate(monster.x, 0, monster.z);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_drawElements(buffers.cube);
+    gl_restore();
+
+    gl_save();
+    gl_translate(monster.x, 2, monster.z);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_drawElements(buffers.cube);
+    gl_restore();
+
+    gl_save();
+    gl_translate(monster.x, 4, monster.z);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_drawElements(buffers.cube);
+    gl_restore();
+
+    gl_save();
+    gl_translate(monster.x, 6, monster.z);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_drawElements(buffers.cube);
+    gl_restore();
+  });
+
+
+
+
+}
+
+
 function v_renderGround(x, z) {
   gl_save();
   gl_translate(x * BLOCK_SIZE, -1.1, z * BLOCK_SIZE);
-  gl_pushBuffers(buffers.plane, textures.metalFloor.glTexture);
-  gl_drawElements(buffers.plane);
-  gl_restore();
-};
-
-function v_renderTreeTops(x, z) {
-  gl_save();
-  gl_translate(x * BLOCK_SIZE, 25, z * BLOCK_SIZE);
-  // use floor buffers with ceiling texture
-  gl_pushBuffers(buffers.plane, textures.ceiling.glTexture);
+  gl_pushBuffers(buffers.plane, textures.ground.glTexture);
   gl_drawElements(buffers.plane);
   gl_restore();
 };
@@ -81,74 +130,29 @@ function v_renderTrees(x, z) {
   for (var n = 0; n < trees.length; n++) {
     var tree = trees[n];
     var treeX = (x * BLOCK_SIZE) + tree.x;
-    var treeY = (z * BLOCK_SIZE) + tree.z;
+    var treeZ = (z * BLOCK_SIZE) + tree.z;
+    
 
-    for (var i = 0; i < tree.height/2; i++) {
+    for (var i = 0; i < tree.height/4; i++) {
+      var treeY = i*4;
       // trunk
       gl_save();
-      gl_translate(treeX, i*2, treeY);
+      gl_translate(treeX, treeY, treeZ);
       gl_rotate(tree.rotationY, 0, 1, 0);
+      gl_scale(2, 2, 2);
       gl_pushBuffers(buffers.cube, textures.tree.glTexture);
       gl_drawElements(buffers.cube);
       gl_restore();
     }
 
-    // // bottom level leaves
-    // gl_save();
-    // gl_translate(treeX, tree.height*0.4, treeY);
-    // gl_rotate(tree.rotationY, 0, 1, 0);
-    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    // gl_drawElements(buffers.smallPlane);
-    // gl_restore();
-
-    // gl_save();
-    // gl_translate(treeX, tree.height*0.5, treeY);
-    // gl_rotate(tree.rotationY, 0, 1, 0);
-    // gl_scale(0.6, 1, 0.6);
-    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    // gl_drawElements(buffers.smallPlane);
-    // gl_restore();
-
-    // gl_save();
-    // gl_translate(treeX, tree.height*0.6, treeY);
-    // gl_rotate(tree.rotationY, 0, 1, 0);
-    // gl_scale(0.5, 1, 0.5);
-    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    // gl_drawElements(buffers.smallPlane);
-    // gl_restore();
-
-    // gl_save();
-    // gl_translate(treeX, tree.height*0.7, treeY);
-    // gl_rotate(tree.rotationY, 0, 1, 0);
-    // gl_scale(0.4, 1, 0.4);
-    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    // gl_drawElements(buffers.smallPlane);
-    // gl_restore();
-
-    // gl_save();
-    // gl_translate(treeX, tree.height*0.8, treeY);
-    // gl_rotate(tree.rotationY, 0, 1, 0);
-    // gl_scale(0.3, 1, 0.3);
-    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    // gl_drawElements(buffers.smallPlane);
-    // gl_restore();
-
-    // gl_save();
-    // gl_translate(treeX, tree.height*0.9, treeY);
-    // gl_rotate(tree.rotationY, 0, 1, 0);
-    // gl_scale(0.2, 1, 0.2);
-    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    // gl_drawElements(buffers.smallPlane);
-    // gl_restore();
-
-    // // top level leaves
-    // gl_save();
-    // gl_translate(treeX, tree.height*0.98, treeY);
-    // gl_rotate(tree.rotationY, 0, 1, 0);
-    // gl_scale(0.1, 1, 0.1);
-    // gl_pushBuffers(buffers.smallPlane, textures.ceiling.glTexture);
-    // gl_drawElements(buffers.smallPlane);
-    // gl_restore();
+    LEAVES_GEOMETRY.forEach(function(leaf) {
+      gl_save();
+      gl_translate(treeX + leaf[0]*8, treeY + leaf[2]*8, treeZ + leaf[1]*8);
+      gl_scale(4, 4, 4);
+      gl_pushBuffers(buffers.cube, textures.leaves.glTexture);
+      gl_drawElements(buffers.cube);
+      gl_restore();
+    });
   }
 };
 
@@ -161,7 +165,6 @@ function v_renderBlocks() {
     var z = block.z;
     v_renderGround(x, z);
     v_renderTrees(x, z);
-    //v_renderTreeTops(x, z);
   });
 }
 
@@ -201,15 +204,17 @@ function v_render() {
   
   // enable lighting
   gl_enableLighting();
-  gl_setAmbientLighting(0.5, 0.5, 0.5);
+  gl_setAmbientLighting(0, 0, 0);
 
 
   //gl_setDirectionalLighting(-0.25, -0.25, -1, 0.8, 0.8, 0.8);
-  gl_setPointLighting(0.5, 0.5, 0.5);
+  gl_setPointLighting(0.9, 0.9, 0.9);
 
   gl_rotate(-camera.pitch, 1, 0, 0);
   gl_rotate(-camera.yaw, 0, 1, 0);
   gl_translate(-camera.x, -camera.y, -camera.z);
   
   v_renderBlocks();
+  v_renderBeacon();
+  v_renderMonsters();
 };
