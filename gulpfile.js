@@ -59,9 +59,10 @@ gulp.task('html', function() {
     .pipe(replace('{{LEAVES_ENCODING}}', fs.readFileSync('./base64Textures/leaves.txt', 'utf8')))
     .pipe(replace('{{TREE_ENCODING}}', fs.readFileSync('./base64Textures/tree.txt', 'utf8')))
     .pipe(replace('{{GROUND_ENCODING}}', fs.readFileSync('./base64Textures/ground.txt', 'utf8')))
-    .pipe(replace('{{BEACON_ENCODING}}', fs.readFileSync('./base64Textures/beacon.txt', 'utf8')))
+    .pipe(replace('{{RED_ENCODING}}', fs.readFileSync('./base64Textures/red.txt', 'utf8')))
     .pipe(replace('{{SHADOW_ENCODING}}', fs.readFileSync('./base64Textures/shadow.txt', 'utf8')))
     .pipe(replace('{{MONSTER_ENCODING}}', fs.readFileSync('./base64Textures/monster.txt', 'utf8')))
+    .pipe(replace('{{ORANGE_ENCODING}}', fs.readFileSync('./base64Textures/orange.txt', 'utf8')))
     .pipe(gulp.dest('./build'));
 });
 

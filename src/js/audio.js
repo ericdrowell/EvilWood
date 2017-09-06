@@ -71,25 +71,25 @@ var MUSIC = {
   }
 };
 
-var audioContext = new AudioContext()
+var audioContext;
 
 function a_init() {
-  a_initGains();
-
   a_playMusic('menu');
 }
 
-function a_initGains() {
-  if (MUSIC.menu.gain) {
-    a_muteAll();
+function a_initAudioContext() {
+  if (audioContext) {
+    audioContext.close();
   }
-  
+  audioContext = new AudioContext()
 
   MUSIC.menu.gain = audioContext.createGain();
   MUSIC.play.gain = audioContext.createGain();
 
   MUSIC.menu.gain.connect(audioContext.destination);
   MUSIC.play.gain.connect(audioContext.destination);  
+
+  a_muteAll();
 }
 
 function a_muteAll() {
@@ -101,13 +101,14 @@ function a_playMusic(music) {
   var time = 0;
   var loops = [];
 
-  a_initGains();
-
-  for (var n=0; n<30; n++) {
-    loops = loops.concat(MUSIC[music].notes);
-  }
+  a_initAudioContext();
 
   MUSIC[music].gain.gain.value = 0.2;
+
+
+  for (var n=0; n<50; n++) {
+    loops = loops.concat(MUSIC[music].notes);
+  }
 
   loops.forEach(function(note, n) {
     var freq = note[0];
@@ -117,6 +118,9 @@ function a_playMusic(music) {
     a_playNote(MUSIC[music].gain, freq, time, duration);
     time+=wait;
   });
+
+
+
 }
 
 function a_playNote(gain, freq, start, duration) {

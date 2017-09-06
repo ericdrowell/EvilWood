@@ -30,7 +30,10 @@ function gl_getVertexShaderGLSL() {
     'varying vec2 vTextureCoord;\n' +
     'varying vec3 vLightWeighting;\n' +
 
+    'uniform bool uUseDistanceLightWeighting;\n' +
+
     'void main(void) {\n' +
+        'float distanceLightWeighting = 1.0;\n' + 
         'vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);\n' +
         'gl_Position = uPMatrix * mvPosition;\n' +
         'vTextureCoord = aTextureCoord;\n' +
@@ -38,7 +41,9 @@ function gl_getVertexShaderGLSL() {
         'vec3 transformedNormal = uNMatrix * aVertexNormal;\n' +
         'float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);\n' +
         'float mvDistance = length(uPointLightingLocation - mvPosition.xyz);\n' +
-        'float distanceLightWeighting = pow(0.99, mvDistance*2.0);\n' +
+        'if (uUseDistanceLightWeighting) {\n' +
+            'distanceLightWeighting = pow(0.99, mvDistance*2.0);\n' +
+        '}\n' +
         'vLightWeighting = uAmbientColor + uPointLightingColor * distanceLightWeighting;\n' +
     '}'
 };

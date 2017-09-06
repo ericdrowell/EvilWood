@@ -104,6 +104,7 @@ function gl_initLightingShader() {
   shaderProgram.ambientColorUniform = context.getUniformLocation(shaderProgram, 'uAmbientColor');
   shaderProgram.pointLightingLocationUniform = context.getUniformLocation(shaderProgram, 'uPointLightingLocation');
   shaderProgram.pointLightingColorUniform = context.getUniformLocation(shaderProgram, 'uPointLightingColor');
+  shaderProgram.useDistanceLighWeightingUniform = context.getUniformLocation(shaderProgram, 'uUseDistanceLightWeighting');
 };
 
 function gl_initTexture(glTexture, image) {
@@ -132,7 +133,7 @@ function gl_createElementArrayBuffer(vertices) {
   return buffer;
 };
 
-function gl_pushBuffers(buffers, texture) {
+function gl_pushBuffers(buffers, texture, useDistanceLightWeighting) {
   // position buffers
   context.bindBuffer(context.ARRAY_BUFFER, buffers.position);
   context.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, context.FLOAT, false, 0, 0);
@@ -143,6 +144,8 @@ function gl_pushBuffers(buffers, texture) {
   context.activeTexture(context.TEXTURE0);
   context.bindTexture(context.TEXTURE_2D, texture);
   context.uniform1i(shaderProgram.samplerUniform, 0);
+
+  context.uniform1i(shaderProgram.useDistanceLighWeightingUniform, useDistanceLightWeighting);
 
   // index buffers
   context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffers.index);

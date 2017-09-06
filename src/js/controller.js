@@ -11,30 +11,31 @@ function c_init() {
   c_attachListeners();
 }
 
+
 function c_handleKeyDown(evt) {
   var keycode = ((evt.which) || (evt.keyCode));
 
   switch (keycode) {
     case 65:
-      // a key
+      // a key (strafe left)
       if (gameState === 'playing') {
         player.sideMovement = -1;
       }
       break;
     case 87:
-      // w key
+      // w key (move forward)
       if (gameState === 'playing') {
         player.straightMovement = 1;
       }
       break;
     case 68:
-      // d key
+      // d key (strafe right)
       if (gameState === 'playing') {
         player.sideMovement = 1;
       }
       break;
-    case 83:
-      // s key
+    case 83: 
+      // s key (move backwards)
       if (gameState === 'playing') {
         player.straightMovement = -1;
       }
@@ -42,6 +43,7 @@ function c_handleKeyDown(evt) {
     case 32:
       // space key
       if (gameState === 'playing') {
+        player.straightMovement = 1;
         player.isClimbing = true;
       }
       break;
@@ -67,6 +69,10 @@ function c_handleKeyUp(evt) {
       break;
     case 83:
       // s key
+      player.straightMovement = 0;
+      break;
+    case 32:
+      // space key
       player.straightMovement = 0;
       break;
   }
@@ -96,19 +102,23 @@ function c_handleClick(evt) {
   // if pointer is not locked
   if (gameState === 'menu' || gameState === 'paused') {
     c_playGame();
-    
   } 
+  else if (gameState === 'playing') {
+    p_fire();
+  }
 }
 
 function c_playGame() {
   gameState = 'playing';
   canvas.requestPointerLock();
+  v_hideScreen();
   a_playMusic('play');
 }
 
 function c_pauseGame() {
   gameState = 'paused';
   a_playMusic('menu');
+  v_showPausedScreen();
 }
 
 function c_attachListeners() {
@@ -141,6 +151,7 @@ function c_gameLoop() {
     elapsedTime = time - lastTime;
   }
   v_updateCameraPos();
+  p_updateLasers();
   w_addBlocks();
   v_render();
 

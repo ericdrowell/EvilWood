@@ -1,3 +1,5 @@
+var INSTRUCTIONS_TEXT = '[WASD]&nbsp; MOVE AROUND&nbsp;&nbsp;&nbsp;<br>[CLICK] SHOOT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>[SPACE] CLIMB TREE &nbsp;&nbsp;&nbsp;<br>[ESC]&nbsp;&nbsp; PAUSE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>';
+
 /*
  * The view is responsible for the camera, loading textures, and rendering the world model
  */
@@ -6,12 +8,13 @@ var context = canvas.getContext('webgl');
 var shaderProgram = context.createProgram();
 var camera = {
   x: 0,
-  y: 6,
+  y: PLAYER_HEIGHT,
   z: 0,
   pitch: 0,
   yaw: 0
 };
 var textures = {};
+var overlayEl = document.getElementById('c');
 
 function v_init() {
   canvas.width = window.innerWidth;
@@ -21,8 +24,21 @@ function v_init() {
 
   v_loadTextures(function() {
     c_gameLoop();
-
   });
+
+  v_showMenuScreen()
+}
+
+function v_showMenuScreen() {
+  overlayEl.innerHTML = '[EVIL WOOD]<br><br>YOU ARE LOST IN AN EVIL FOREST<br>LET THE NORTH STAR GUIDE YOU<br>CLIMB TREES TO SEE THE SKY<br>FIND THE RED BEACON TO ESCAPE<br>BEWARE THE DARK SOULS<br><br>' + INSTRUCTIONS_TEXT + '<br><br>CLICK SCREEN TO START'
+}
+
+function v_showPausedScreen() {
+  overlayEl.innerHTML = '[PAUSED]<br><br>' + INSTRUCTIONS_TEXT + '<br>CLICK SCREEN TO CONTINUE'
+}
+
+function v_hideScreen() {
+  overlayEl.innerHTML = ''
 }
 
 function v_loadTextures(callback) {
@@ -36,14 +52,17 @@ function v_loadTextures(callback) {
     leaves: {
       encoding: '{{LEAVES_ENCODING}}'
     },
-    beacon: {
-      encoding: '{{BEACON_ENCODING}}'
+    red: {
+      encoding: '{{RED_ENCODING}}'
     },
     shadow: {
       encoding: '{{SHADOW_ENCODING}}'
     },
     monster: {
       encoding: '{{MONSTER_ENCODING}}'
+    },
+    orange: {
+      encoding: '{{ORANGE_ENCODING}}'
     }
   };
 
@@ -72,13 +91,26 @@ function v_renderBeacon() {
 
   gl_save();
   gl_translate(beacon.x, 6, beacon.z);
-  gl_pushBuffers(buffers.cube, textures.beacon.glTexture);
+  gl_pushBuffers(buffers.cube, textures.red.glTexture, false);
   gl_drawElements(buffers.cube);
   gl_restore();
 
+  // beacon shadow
   gl_save();
   gl_translate(beacon.x, -1.99, beacon.z);
-  gl_pushBuffers(buffers.cube, textures.shadow.glTexture);
+  gl_pushBuffers(buffers.cube, textures.shadow.glTexture, true);
+  gl_drawElements(buffers.cube);
+  gl_restore();
+
+  // star
+  var starDirection = vec3.create([beacon.x - camera.x, 0, beacon.z - camera.z]);
+  var STAR_DIST = 100;
+
+  vec3.normalize(starDirection);
+  gl_save();
+  gl_translate(camera.x, 140, camera.z);
+  gl_translate(starDirection[0] * STAR_DIST, 0, starDirection[2] * STAR_DIST);
+  gl_pushBuffers(buffers.cube, textures.orange.glTexture, false);
   gl_drawElements(buffers.cube);
   gl_restore();
 }
@@ -87,25 +119,25 @@ function v_renderMonsters() {
   world.monsters.forEach(function(monster) {
     gl_save();
     gl_translate(monster.x, 0, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
     gl_drawElements(buffers.cube);
     gl_restore();
 
     gl_save();
     gl_translate(monster.x, 2, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
     gl_drawElements(buffers.cube);
     gl_restore();
 
     gl_save();
     gl_translate(monster.x, 4, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
     gl_drawElements(buffers.cube);
     gl_restore();
 
     gl_save();
     gl_translate(monster.x, 6, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture);
+    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
     gl_drawElements(buffers.cube);
     gl_restore();
   });
@@ -119,7 +151,7 @@ function v_renderMonsters() {
 function v_renderGround(x, z) {
   gl_save();
   gl_translate(x * BLOCK_SIZE, -1.1, z * BLOCK_SIZE);
-  gl_pushBuffers(buffers.plane, textures.ground.glTexture);
+  gl_pushBuffers(buffers.plane, textures.ground.glTexture, true);
   gl_drawElements(buffers.plane);
   gl_restore();
 };
@@ -140,7 +172,7 @@ function v_renderTrees(x, z) {
       gl_translate(treeX, treeY, treeZ);
       gl_rotate(tree.rotationY, 0, 1, 0);
       gl_scale(2, 2, 2);
-      gl_pushBuffers(buffers.cube, textures.tree.glTexture);
+      gl_pushBuffers(buffers.cube, textures.tree.glTexture, true);
       gl_drawElements(buffers.cube);
       gl_restore();
     }
@@ -149,7 +181,7 @@ function v_renderTrees(x, z) {
       gl_save();
       gl_translate(treeX + leaf[0]*8, treeY + leaf[2]*8, treeZ + leaf[1]*8);
       gl_scale(4, 4, 4);
-      gl_pushBuffers(buffers.cube, textures.leaves.glTexture);
+      gl_pushBuffers(buffers.cube, textures.leaves.glTexture, true);
       gl_drawElements(buffers.cube);
       gl_restore();
     });
@@ -176,6 +208,11 @@ function v_updateCameraPos() {
 
     if (player.isClimbing) {
       camera.y += distEachFrame * -1;
+
+      if (camera.y < PLAYER_HEIGHT) {
+        camera.y = PLAYER_HEIGHT;
+        player.isClimbing = false;
+      }
     }
     else {
       camera.z += distEachFrame * Math.cos(camera.yaw);
@@ -189,10 +226,20 @@ function v_updateCameraPos() {
     camera.z += distEachFrame * Math.cos(camera.yaw + Math.PI / 2);
     camera.x += distEachFrame * Math.sin(camera.yaw + Math.PI / 2);
   }
-
-
-  
 };
+
+function v_renderLasers() {
+  player.lasers.forEach(function(laser) {
+    gl_save();
+    gl_translate(laser.x, laser.y, laser.z);
+    gl_rotate(laser.yaw, 0, 1, 0);
+    gl_rotate(laser.pitch, 1, 0, 0);
+    gl_scale(0.2, 0.2, 5);
+    gl_pushBuffers(buffers.cube, textures.orange.glTexture, false);
+    gl_drawElements(buffers.cube);
+    gl_restore();
+  });
+}
 
 function v_render() {
   gl_clear();
@@ -217,4 +264,5 @@ function v_render() {
   v_renderBlocks();
   v_renderBeacon();
   v_renderMonsters();
+  v_renderLasers();
 };

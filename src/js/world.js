@@ -47,8 +47,8 @@ function w_init() {
 function w_addBeacon() {
   world.beacon = {
     x: 0,
-    z: -100,
-    rotationY: 0
+    z: -50,
+    rota4ionY: 0
   }
 }
 
