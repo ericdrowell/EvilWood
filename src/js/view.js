@@ -6,15 +6,10 @@ var INSTRUCTIONS_TEXT = '[WASD]&nbsp; MOVE AROUND&nbsp;&nbsp;&nbsp;<br>[CLICK] S
 var canvas = document.getElementById('scene');
 var context = canvas.getContext('webgl');
 var shaderProgram = context.createProgram();
-var camera = {
-  x: 0,
-  y: PLAYER_HEIGHT,
-  z: 0,
-  pitch: 0,
-  yaw: 0
-};
+var camera = {};
 var textures = {};
-var overlayEl = document.getElementById('c');
+var overlayEl = document.getElementById('a');
+var healthEl = document.getElementById('b');
 
 function v_init() {
   canvas.width = window.innerWidth;
@@ -25,16 +20,22 @@ function v_init() {
   v_loadTextures(function() {
     c_gameLoop();
   });
-
-  v_showMenuScreen()
 }
 
 function v_showMenuScreen() {
-  overlayEl.innerHTML = '[EVIL WOOD]<br><br>YOU ARE LOST IN AN EVIL FOREST<br>LET THE NORTH STAR GUIDE YOU<br>CLIMB TREES TO SEE THE SKY<br>FIND THE RED BEACON TO ESCAPE<br>BEWARE THE DARK SOULS<br><br>' + INSTRUCTIONS_TEXT + '<br><br>CLICK SCREEN TO START'
+  overlayEl.innerHTML = 'EVIL WOOD<br><br>YOU ARE LOST IN AN EVIL FOREST<br>CLIMB TREES TO SEE THE SKY<br>FIND THE RED BEACON TO ESCAPE<br>LET THE NORTH STAR GUIDE YOU<br>BEWARE THE DARK SOULS<br><br>' + INSTRUCTIONS_TEXT + '<br><br>CLICK SCREEN TO START'
 }
 
 function v_showPausedScreen() {
-  overlayEl.innerHTML = '[PAUSED]<br><br>' + INSTRUCTIONS_TEXT + '<br>CLICK SCREEN TO CONTINUE'
+  overlayEl.innerHTML = 'PAUSED<br><br>' + INSTRUCTIONS_TEXT + '<br>CLICK SCREEN TO CONTINUE'
+}
+
+function v_showWinScreen() {
+  overlayEl.innerHTML = 'YOU WIN!<br><br>CONGRATULATIONS ON ESCAPING EVIL WOOD<br>YOUR CUNNING, SKILL, AND BRAVERY<br>SHALL BE REMEMBERED FOR ALL TIME<br><br>CLICK SCREEN TO PLAY AGAIN'
+}
+
+function v_showDiedScreen() {
+  overlayEl.innerHTML = 'YOU DIED<br><br>DARK SOULS DEVOUR YOUR BODY<br>EVIL WOOD SLOWLY FADES AWAY<br>NONE SHALL KNOW OF YOUR HORRIFIC FATE<br><br>CLICK SCREEN TO TRY AGAIN'
 }
 
 function v_hideScreen() {
@@ -63,6 +64,9 @@ function v_loadTextures(callback) {
     },
     orange: {
       encoding: '{{ORANGE_ENCODING}}'
+    },
+    white: {
+      encoding: '{{WHITE_ENCODING}}'
     }
   };
 
@@ -88,63 +92,46 @@ function v_loadTextures(callback) {
 
 function v_renderBeacon() {
   var beacon = world.beacon;
+  var point = beacon.points[0];
 
-  gl_save();
-  gl_translate(beacon.x, 6, beacon.z);
-  gl_pushBuffers(buffers.cube, textures.red.glTexture, false);
-  gl_drawElements(buffers.cube);
-  gl_restore();
+  if (gameState !== 'won') {
+    gl_save();
+    gl_translate(point.x, point.y, point.z);
+    gl_pushBuffers(buffers.cube, textures.red.glTexture, false);
+    gl_drawElements(buffers.cube);
+    gl_restore();
 
-  // beacon shadow
-  gl_save();
-  gl_translate(beacon.x, -1.99, beacon.z);
-  gl_pushBuffers(buffers.cube, textures.shadow.glTexture, true);
-  gl_drawElements(buffers.cube);
-  gl_restore();
+    // beacon shadow
+    gl_save();
+    gl_translate(point.x, -1.99, point.z);
+    gl_pushBuffers(buffers.cube, textures.shadow.glTexture, true);
+    gl_drawElements(buffers.cube);
+    gl_restore();
 
-  // star
-  var starDirection = vec3.create([beacon.x - camera.x, 0, beacon.z - camera.z]);
-  var STAR_DIST = 100;
+    // star
+    var starDirection = vec3.create([point.x - camera.x, 0, point.z - camera.z]);
 
-  vec3.normalize(starDirection);
-  gl_save();
-  gl_translate(camera.x, 140, camera.z);
-  gl_translate(starDirection[0] * STAR_DIST, 0, starDirection[2] * STAR_DIST);
-  gl_pushBuffers(buffers.cube, textures.orange.glTexture, false);
-  gl_drawElements(buffers.cube);
-  gl_restore();
+    vec3.normalize(starDirection); 
+    gl_save();
+    gl_translate(camera.x, 140, camera.z);
+    gl_translate(starDirection[0] * STAR_DIST, 0, starDirection[2] * STAR_DIST);
+    gl_pushBuffers(buffers.cube, textures.orange.glTexture, false);
+    gl_drawElements(buffers.cube);
+    gl_restore();
+  }
 }
 
 function v_renderMonsters() {
   world.monsters.forEach(function(monster) {
-    gl_save();
-    gl_translate(monster.x, 0, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
-    gl_drawElements(buffers.cube);
-    gl_restore();
-
-    gl_save();
-    gl_translate(monster.x, 2, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
-    gl_drawElements(buffers.cube);
-    gl_restore();
-
-    gl_save();
-    gl_translate(monster.x, 4, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
-    gl_drawElements(buffers.cube);
-    gl_restore();
-
-    gl_save();
-    gl_translate(monster.x, 6, monster.z);
-    gl_pushBuffers(buffers.cube, textures.monster.glTexture, true);
-    gl_drawElements(buffers.cube);
-    gl_restore();
+    var texture = monster.isHit ? 'white' : 'monster'
+    monster.points.forEach(function(point) {
+      gl_save();
+      gl_translate(point.x, point.y, point.z);
+      gl_pushBuffers(buffers.cube, textures[texture].glTexture, true);
+      gl_drawElements(buffers.cube);
+      gl_restore();
+    })
   });
-
-
-
-
 }
 
 
@@ -157,36 +144,49 @@ function v_renderGround(x, z) {
 };
 
 function v_renderTrees(x, z) {
-  var trees = world.blocks[x][z].trees;
+  if (world.blocks[x] && world.blocks[x][z]){
+    var trees = world.blocks[x][z].trees;
 
-  for (var n = 0; n < trees.length; n++) {
-    var tree = trees[n];
-    var treeX = (x * BLOCK_SIZE) + tree.x;
-    var treeZ = (z * BLOCK_SIZE) + tree.z;
-    
+    for (var n = 0; n < trees.length; n++) {
+      var tree = trees[n];
 
-    for (var i = 0; i < tree.height/4; i++) {
-      var treeY = i*4;
-      // trunk
-      gl_save();
-      gl_translate(treeX, treeY, treeZ);
-      gl_rotate(tree.rotationY, 0, 1, 0);
-      gl_scale(2, 2, 2);
-      gl_pushBuffers(buffers.cube, textures.tree.glTexture, true);
-      gl_drawElements(buffers.cube);
-      gl_restore();
+      tree.points.forEach(function(point) {
+        // trunk
+        gl_save();
+        gl_translate(point.x, point.y, point.z);
+        gl_rotate(tree.rotationY, 0, 1, 0);
+        gl_scale(2, 2, 2);
+        gl_pushBuffers(buffers.cube, textures.tree.glTexture, true);
+        gl_drawElements(buffers.cube);
+        gl_restore();
+      });
+
+      var lastPoint = tree.points[tree.points.length-1];
+      var treeX = lastPoint.x;
+      var treeY = lastPoint.y;
+      var treeZ = lastPoint.z;
+
+      LEAVES_GEOMETRY.forEach(function(leaf) {
+        gl_save();
+        gl_translate(treeX + leaf[0]*8, treeY + leaf[2]*8, treeZ + leaf[1]*8);
+        gl_scale(4, 4, 4);
+        gl_pushBuffers(buffers.cube, textures.leaves.glTexture, true);
+        gl_drawElements(buffers.cube);
+        gl_restore();
+      });
     }
-
-    LEAVES_GEOMETRY.forEach(function(leaf) {
-      gl_save();
-      gl_translate(treeX + leaf[0]*8, treeY + leaf[2]*8, treeZ + leaf[1]*8);
-      gl_scale(4, 4, 4);
-      gl_pushBuffers(buffers.cube, textures.leaves.glTexture, true);
-      gl_drawElements(buffers.cube);
-      gl_restore();
-    });
   }
 };
+
+function v_renderHealth() {
+  var str = '';
+
+  for (var n=0; n<player.health; n++) {
+    str += '<span>&hearts;</span>';
+  }
+
+  healthEl.innerHTML = str;
+}
 
 function v_renderBlocks() {
   // only render blocks potentially within view
@@ -200,36 +200,8 @@ function v_renderBlocks() {
   });
 }
 
-function v_updateCameraPos() {
-
-  if (player.straightMovement !== 0) {
-    var direction = player.straightMovement === 1 ? -1 : 1;
-    var distEachFrame = direction * PLAYER_SPEED * elapsedTime / 1000;
-
-    if (player.isClimbing) {
-      camera.y += distEachFrame * -1;
-
-      if (camera.y < PLAYER_HEIGHT) {
-        camera.y = PLAYER_HEIGHT;
-        player.isClimbing = false;
-      }
-    }
-    else {
-      camera.z += distEachFrame * Math.cos(camera.yaw);
-      camera.x += distEachFrame * Math.sin(camera.yaw);
-    }
-  }
-  
-  if (player.sideMovement !== 0) {
-    var direction = player.sideMovement === 1 ? 1 : -1;
-    var distEachFrame = direction * PLAYER_SPEED * elapsedTime / 1000;
-    camera.z += distEachFrame * Math.cos(camera.yaw + Math.PI / 2);
-    camera.x += distEachFrame * Math.sin(camera.yaw + Math.PI / 2);
-  }
-};
-
 function v_renderLasers() {
-  player.lasers.forEach(function(laser) {
+  world.lasers.forEach(function(laser) {
     gl_save();
     gl_translate(laser.x, laser.y, laser.z);
     gl_rotate(laser.yaw, 0, 1, 0);
@@ -261,6 +233,7 @@ function v_render() {
   gl_rotate(-camera.yaw, 0, 1, 0);
   gl_translate(-camera.x, -camera.y, -camera.z);
   
+  v_renderHealth()
   v_renderBlocks();
   v_renderBeacon();
   v_renderMonsters();

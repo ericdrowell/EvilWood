@@ -73,10 +73,6 @@ var MUSIC = {
 
 var audioContext;
 
-function a_init() {
-  a_playMusic('menu');
-}
-
 function a_initAudioContext() {
   if (audioContext) {
     audioContext.close();

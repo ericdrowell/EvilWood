@@ -1,5 +1,4 @@
-// block width and height.  The world is made up of equal sized tiled blocks
-var BLOCK_SIZE = 100;
+var BLOCK_SIZE = 100; //100;
 
 var buffers = {
   cube: {
@@ -38,30 +37,16 @@ var buffers = {
   },
   plane: {
     position: gl_createArrayBuffer([
-      -50, 0, -50, -50, 0, 50, 50, 0, 50, 50, 0, -50
+      -BLOCK_SIZE/2, 0, -BLOCK_SIZE/2, -BLOCK_SIZE/2, 0, BLOCK_SIZE/2, BLOCK_SIZE/2, 0, BLOCK_SIZE/2, BLOCK_SIZE/2, 0, -BLOCK_SIZE/2
     ]),
     normal: gl_createArrayBuffer([
       0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
     ]),
     texture: gl_createArrayBuffer([
-      0, 25, 0, 0, 25, 0, 25, 25
+      0, BLOCK_SIZE/4, 0, 0, BLOCK_SIZE/4, 0, BLOCK_SIZE/4, BLOCK_SIZE/4
     ]),
     index: gl_createElementArrayBuffer([
       0, 1, 2, 0, 2, 3
     ])
-  },
-  // smallPlane: {
-  //   position: gl_createArrayBuffer([
-  //     -20, 0, -20, -20, 0, 20, 20, 0, 20, 20, 0, -20
-  //   ]),
-  //   normal: gl_createArrayBuffer([
-  //     0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
-  //   ]),
-  //   texture: gl_createArrayBuffer([
-  //     0, 10, 0, 0, 10, 0, 10, 10
-  //   ]),
-  //   index: gl_createElementArrayBuffer([
-  //     0, 1, 2, 0, 2, 3
-  //   ])
-  // }
+  }
 }

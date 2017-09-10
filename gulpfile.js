@@ -15,6 +15,7 @@ var cleanCSS = require('gulp-clean-css');
 
 var JS_SOURCES = [
   './src/js/glMatrix.custom.min.js',
+  './src/js/config.js',
   './src/js/utils.js',
   './src/js/webgl.js',
   './src/js/shaders.js',
@@ -63,6 +64,7 @@ gulp.task('html', function() {
     .pipe(replace('{{SHADOW_ENCODING}}', fs.readFileSync('./base64Textures/shadow.txt', 'utf8')))
     .pipe(replace('{{MONSTER_ENCODING}}', fs.readFileSync('./base64Textures/monster.txt', 'utf8')))
     .pipe(replace('{{ORANGE_ENCODING}}', fs.readFileSync('./base64Textures/orange.txt', 'utf8')))
+    .pipe(replace('{{WHITE_ENCODING}}', fs.readFileSync('./base64Textures/white.txt', 'utf8')))
     .pipe(gulp.dest('./build'));
 });
 

@@ -8,32 +8,9 @@ canvas {
   background-color: black;
 }
 
-/* vertical crosshair bar */
-#a {
-  width: 2px;
-  height: 40px;
-  position: fixed;
-  left: 50%;
-  margin-left: -1px;
-  top: 50%;
-  margin-top: -20px;
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-/* horizontal crosshair bar */
-#b {
-  width: 40px;
-  height: 2px;
-  position: fixed;
-  left: 50%;
-  margin-left: -20px;
-  top: 50%;
-  margin-top: -1px;
-  background-color: rgba(255, 255, 255, 0.3);
-}
 
 /* overlay */
-#c {
+#a {
   width: 100%;
   position: fixed;
   top: 10%;
@@ -42,4 +19,19 @@ canvas {
   color: white;
   font-family: Courier New, monospace;
   font-size: 4vh;
+}
+
+/* health */
+#b {
+  position: fixed;
+  color: red;
+  font-size: 5vh;
+  top: 10px;
+  left: 10px;
+  font-family: Courier New, monospace;
+}
+
+/* health hearts */
+#b span {
+  margin-right: 5px;
 }

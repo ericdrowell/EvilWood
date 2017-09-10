@@ -1,16 +1,32 @@
 var elapsedTime = 0;
 var lastTime = 0;
+var now = 0;
 var gameState = 'menu';
+var nearbyTree = null;
 
 function c_init() {
-  gl_init(); // webgl
-  w_init(); // world
-  p_init(); // player
-  v_init(); // view
-  a_init(); // audio
+  gl_init(); 
+  c_resetGame();
+  v_init();
   c_attachListeners();
 }
 
+function c_resetGame() {
+  w_init();
+  p_init();
+  gameState = 'menu';
+  a_playMusic('menu');
+
+  camera = {
+    x: 0,
+    y: PLAYER_HEIGHT,
+    z: 0,
+    pitch: 0,
+    yaw: 0
+  };
+
+  v_showMenuScreen();
+}
 
 function c_handleKeyDown(evt) {
   var keycode = ((evt.which) || (evt.keyCode));
@@ -43,8 +59,11 @@ function c_handleKeyDown(evt) {
     case 32:
       // space key
       if (gameState === 'playing') {
-        player.straightMovement = 1;
-        player.isClimbing = true;
+        nearbyTree = w_getNearbyTree(camera);
+        if (nearbyTree) {
+          player.straightMovement = 1;
+          player.isClimbing = true;
+        }
       }
       break;
   }
@@ -62,6 +81,7 @@ function c_handleKeyUp(evt) {
     case 87:
       // w key
       player.straightMovement = 0;
+      
       break;
     case 68:
       // d key
@@ -73,7 +93,9 @@ function c_handleKeyUp(evt) {
       break;
     case 32:
       // space key
-      player.straightMovement = 0;
+      if (player.isClimbing) {
+        player.straightMovement = 0;
+      }
       break;
   }
 };
@@ -106,6 +128,9 @@ function c_handleClick(evt) {
   else if (gameState === 'playing') {
     p_fire();
   }
+  else if (gameState === 'won' || gameState === 'died') {
+    c_resetGame();
+  }
 }
 
 function c_playGame() {
@@ -119,6 +144,22 @@ function c_pauseGame() {
   gameState = 'paused';
   a_playMusic('menu');
   v_showPausedScreen();
+}
+
+function c_win() {
+  document.exitPointerLock();
+  gameState = 'won';
+  a_playMusic('menu');
+  c_resetGame();
+  v_showWinScreen();
+}
+
+function c_die() {
+  document.exitPointerLock();
+  gameState = 'died';
+  a_playMusic('menu');
+  c_resetGame();
+  v_showDiedScreen();
 }
 
 function c_attachListeners() {
@@ -146,16 +187,21 @@ function c_attachListeners() {
 };
 
 function c_gameLoop() {
-  var time = new Date().getTime();
+  now = new Date().getTime();
   if (lastTime !== 0) {
-    elapsedTime = time - lastTime;
+    elapsedTime = now - lastTime;
   }
-  v_updateCameraPos();
-  p_updateLasers();
-  w_addBlocks();
+
+  if (gameState === 'playing') {
+    p_updatePlayerPos();
+    w_updateLasers();
+    w_updateMonsters();
+    w_addBlocks(true); 
+  }
+
   v_render();
 
-  lastTime = time;
+  lastTime = now;
 
   window.requestAnimationFrame(c_gameLoop);  
 } 

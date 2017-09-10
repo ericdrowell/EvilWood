@@ -42,7 +42,7 @@ function gl_getVertexShaderGLSL() {
         'float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);\n' +
         'float mvDistance = length(uPointLightingLocation - mvPosition.xyz);\n' +
         'if (uUseDistanceLightWeighting) {\n' +
-            'distanceLightWeighting = pow(0.99, mvDistance*2.0);\n' +
+            'distanceLightWeighting = pow(0.992, mvDistance*2.0);\n' +
         '}\n' +
         'vLightWeighting = uAmbientColor + uPointLightingColor * distanceLightWeighting;\n' +
     '}'

@@ -1,0 +1,12 @@
+var TREES_PER_BLOCK = 5; //20;
+var MONSTERS_PER_BLOCK = 1;
+var BEACON_DISTANCE = 100; //2000;
+var GRID_CELL_SIZE = 2;
+var LASER_SPEED = 200; // units / s
+var LASER_EXPIRE = 1; // s
+var LASER_START_DIST_FROM_PLAYER = 2;
+var MONSTER_COOLDOWN_TIME = 1; // s
+var MONSTER_SPEED = 10; // units / s
+var PLAYER_SPEED = 40; // units / s
+var PLAYER_HEIGHT = 6;
+var STAR_DIST = 100;
