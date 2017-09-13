@@ -10,6 +10,7 @@
 7 2093  2217  2349  2489  2637  2794  2960  3136  3322  3520  3729  3951
 8 4186  4435  4699  4978  5274  5588  5920  6272  6645  7040  7459  7902
 */
+var musicTimeout = null;
 
 var MUSIC = {
   menu: {
@@ -71,61 +72,85 @@ var MUSIC = {
   }
 };
 
-var audioContext;
+
+var songAudioContext;
+var songGain;
+var soundEffectAudioContext;
+var soundEffectGain;
+
+function a_init() {
+  soundEffectAudioContext = new AudioContext()
+}
 
 function a_initAudioContext() {
-  if (audioContext) {
-    audioContext.close();
+  if (songAudioContext) {
+    songAudioContext.close();
   }
-  audioContext = new AudioContext()
-
-  MUSIC.menu.gain = audioContext.createGain();
-  MUSIC.play.gain = audioContext.createGain();
-
-  MUSIC.menu.gain.connect(audioContext.destination);
-  MUSIC.play.gain.connect(audioContext.destination);  
-
-  a_muteAll();
+  songAudioContext = new AudioContext()
 }
 
-function a_muteAll() {
-  MUSIC.menu.gain.gain.value = 0;
-  MUSIC.play.gain.gain.value = 0;
+function a_playMusic(music, volume) {
+  // var time = 0;
+  // var loops = [];
+
+  // if (musicTimeout) {
+  //   clearTimeout(musicTimeout);
+  // }
+
+  // a_initAudioContext();
+
+
+  // for (var n=0; n<1; n++) {
+  //   loops = loops.concat(MUSIC[music].notes);
+  // }
+
+  // loops.forEach(function(note, n) {
+  //   var freq = note[0];
+  //   var duration = note[1];
+  //   var wait = note[2];
+
+  //   a_playSound(freq, time, duration, volume, songAudioContext);
+  //   time+=wait;
+  // });
+
+  // musicTimeout = setTimeout(function() {
+  //   a_playMusic(music, volume);
+  // }, time * 1000);
 }
 
-function a_playMusic(music) {
-  var time = 0;
-  var loops = [];
 
-  a_initAudioContext();
-
-  MUSIC[music].gain.gain.value = 0.2;
-
-
-  for (var n=0; n<50; n++) {
-    loops = loops.concat(MUSIC[music].notes);
-  }
-
-  loops.forEach(function(note, n) {
-    var freq = note[0];
-    var duration = note[1];
-    var wait = note[2];
-
-    a_playNote(MUSIC[music].gain, freq, time, duration);
-    time+=wait;
-  });
-
-
-
-}
-
-function a_playNote(gain, freq, start, duration) {
+function a_playSound(freq, start, duration, volume, audioContext, easing, type) {
   var oscillator = audioContext.createOscillator();
+
+  var gain = audioContext.createGain();
+  gain.connect(audioContext.destination);
 
   oscillator.connect(gain);
   oscillator.frequency.value = freq;
-  oscillator.type = 'square';
-  
+  oscillator.type = type || 'square';
+  gain.gain.value = volume;
+
+  if (easing === 'ease-in') {
+    gain.gain.setValueAtTime(0, audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + start + duration);
+  }
+  else if (easing === 'ease-out') {
+    gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + start + duration);
+  }
+  else if (easing === 'ease-in-out') {
+    gain.gain.setValueAtTime(0, audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + start + duration*0.5);
+    gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + start + duration);
+  }
+
+  // if (attack !== start) {
+  //   gain.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + start + attack);
+  // }
+
+  // if (decay !== duration) {
+  //   gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + start + decay);
+  // }
+
   oscillator.start(audioContext.currentTime + start);
   oscillator.stop(audioContext.currentTime + start + duration);
 }

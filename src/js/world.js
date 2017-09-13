@@ -47,6 +47,7 @@ function w_init() {
   numBlocks = 0;
 
   w_addBlock(0, 0);
+  w_addBlocks();
   w_addBeacon();
 }
 
@@ -58,6 +59,23 @@ function w_getGridPoint(point) {
   }
 }
 
+function w_updateBeacon() {
+  var beacon = world.beacon;
+  var rotationEachFrame = BEACON_ROTATION_SPEED * MATH_PI * 2 * elapsedTime / 1000;
+  beacon.rotationY += rotationEachFrame;
+
+  var orbitEachFrame = BEACON_ORBIT_ROTATION_SPEEED * MATH_PI * 2 * elapsedTime / 1000;
+
+  beacon.orbitY += orbitEachFrame;
+
+  w_removeGridCell(beacon);
+
+  beacon.x = Math.cos(beacon.orbitY) * BEACON_DISTANCE;
+  beacon.z = Math.sin(beacon.orbitY) * BEACON_DISTANCE;
+
+  w_addObjectToGrid(world.beacon, world.beacon);
+}
+
 function w_updateMonsters() {
   world.monsters.forEach(function(monster, n) {
     // if monster is dead
@@ -66,6 +84,9 @@ function w_updateMonsters() {
         w_removeGridCell(point);
       }); 
       world.monsters.splice(n, 1);
+
+      //a_soundEffect('die');
+      aa.play('monster-die');
     }
     else {
       var firstPoint = monster.points[0];
@@ -73,13 +94,29 @@ function w_updateMonsters() {
       // move monster closer to player
       var playerDirection = vec3.create([firstPoint.x - camera.x, 0, firstPoint.z - camera.z]);
       vec3.normalize(playerDirection);
-      var distEachFrame = MONSTER_SPEED * elapsedTime / 1000;
 
-      monster.points.forEach(function(point) {
+      var distEachFrame = (monster.points[0].y === 0 ? MONSTER_SPEED : MONSTER_JUMP_SPEED) * elapsedTime / 1000;
+
+      if (MATH_RANDOM() < MONSTER_CHANCE_TO_JUMP_PER_FRAME && monster.verticalVelocity === 0) {
+        monster.verticalVelocity = (MATH_RANDOM() * (MONSTER_JUMP_MAX_VELOCITY-MONSTER_JUMP_MIN_VELOCITY)) + MONSTER_JUMP_MIN_VELOCITY;
+      }
+
+      var verticalDistEachFrame = monster.verticalVelocity * elapsedTime / 1000;
+
+      // d = at
+      monster.verticalVelocity -= GRAVITY * (elapsedTime / 1000)
+
+      monster.points.forEach(function(point, n) {
         w_removeGridCell(point);
     
         point.x += playerDirection[0]*distEachFrame*-1;
+        point.y += verticalDistEachFrame;
         point.z += playerDirection[2]*distEachFrame*-1;
+
+        if (point.y < n * 2) {
+          point.y = n * 2;
+          monster.verticalVelocity = 0;
+        }
 
         w_removeGridCell(point);
         w_addObjectToGrid(monster, point);
@@ -91,12 +128,16 @@ function w_updateMonsters() {
 function w_updateLasers() {
   var distEachFrame = LASER_SPEED * elapsedTime / 1000 *-1;
   world.lasers.forEach(function(laser, n) {
-    laser.z += Math.cos(laser.yaw) * distEachFrame;
-    laser.y += Math.tan(laser.pitch) * distEachFrame * -1;
-    laser.x += Math.sin(laser.yaw) * distEachFrame;
+    var pitch = laser.pitch+MATH_PI/2;
+    var yaw = laser.yaw;
+
+    laser.x += Math.sin(yaw) * Math.sin(pitch) * distEachFrame;
+    laser.y += Math.cos(pitch) * distEachFrame;
+    laser.z += Math.cos(yaw) * Math.sin(pitch) * distEachFrame;
 
     var intersectingObj = w_getGridObject(laser);
 
+    // handle hit monster
     if (intersectingObj && intersectingObj.type === 'monster') {
       if (intersectingObj.timout) {
         clearTimeout(intersectingObj.timeout);
@@ -109,7 +150,23 @@ function w_updateLasers() {
       intersectingObj.timeout = setTimeout(function() {
         intersectingObj.isHit = false;
         intersectingObj.health -= 1;
-      }, 100);
+        //a_soundEffect('monster-hurt');
+        aa.play('damage');
+      }, PAIN_FLASH_DURATION);
+    }
+
+    // handle hit tree
+    if (w_isNearbyTree(laser)) {
+      world.lasers.splice(n, 1);
+      //a_soundEffect('laser-hit');
+      aa.play('damage');
+    }
+
+    // handle hit floor
+    if (laser.y <= 0) {
+      world.lasers.splice(n, 1);
+      //a_soundEffect('laser-hit');
+      aa.play('damage');
     }
 
     // handle laser expire
@@ -168,21 +225,19 @@ function w_getNearbyObjects(point, dist) {
   var gridPoint = w_getGridPoint(point);
   var objects = [];
 
-  if (!dist) {
-    dist = 3;
-  }
-
   // add to all cells around point
   for (var x=-dist; x<=dist; x++) {
-    for (var z=-dist; z<=dist; z++) {
-      var key = w_getGridCellKey({
-        x: gridPoint.x + x,
-        y: gridPoint.y,
-        z: gridPoint.z + z
-      });
+    for (var y=-dist; y<=dist; y++) {
+      for (var z=-dist; z<=dist; z++) {
+        var key = w_getGridCellKey({
+          x: gridPoint.x + x,
+          y: gridPoint.y + y,
+          z: gridPoint.z + z
+        });
 
-      if (world.grid[key]) {
-        objects.push(world.grid[key]);
+        if (world.grid[key]) {
+          objects.push(world.grid[key]);
+        }
       }
     }
   }
@@ -190,12 +245,33 @@ function w_getNearbyObjects(point, dist) {
   return objects;
 }
 
-function w_isNearbyBeacon(point) {
+function w_getNearbyVerticalObjects(point, dist) {
+  var gridPoint = w_getGridPoint(point);
+  var objects = [];
+
+  // add to all cells around point
+  for (var y=-dist; y<=dist; y++) {
+
+    var key = w_getGridCellKey({
+      x: gridPoint.x,
+      y: gridPoint.y + y,
+      z: gridPoint.z
+    });
+
+    if (world.grid[key]) {
+      objects.push(world.grid[key]);
+    }
+  }
+
+  return objects;
+}
+
+function w_isNearbyBeacon() {
   var objects = w_getNearbyObjects({
-    x: point.x,
+    x: camera.x,
     y: 6,
-    z: point.z
-  });
+    z: camera.z
+  }, 3);
 
   for (var key in objects) {
     if (objects[key].type === 'beacon') {
@@ -206,12 +282,20 @@ function w_isNearbyBeacon(point) {
   return false;
 }
 
-function w_getNearbyTree(point) {
-  var objects = w_getNearbyObjects({
-    x: point.x,
-    y: 0,
-    z: point.z
-  }, 5);
+function w_isNearbyTree(point) {
+  var objects = w_getNearbyVerticalObjects(point, 1);
+
+  for (var key in objects) {
+    if (objects[key].type === 'tree') {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function w_getNearbyTree() {
+  var objects = w_getNearbyObjects(camera, 5);
 
   for (var key in objects) {
     if (objects[key].type === 'tree') {
@@ -222,12 +306,8 @@ function w_getNearbyTree(point) {
   return null;
 }
 
-function w_getNearbyMonsters(point) {
-  var objects = w_getNearbyObjects({
-    x: point.x,
-    y: 0,
-    z: point.z
-  });
+function w_getNearbyMonsters() {
+  var objects = w_getNearbyObjects(camera, 3);
 
   var monsters = [];
 
@@ -241,19 +321,17 @@ function w_getNearbyMonsters(point) {
 }
 
 function w_addBeacon() {
+  var angle = MATH_RANDOM() * MATH_PI * 2;
   world.beacon = {
     type: 'beacon',
-    points: [
-      {
-        x: BEACON_DISTANCE * 2 * MATH_RANDOM() - BEACON_DISTANCE,
-        y: 6,
-        z: BEACON_DISTANCE * 2 * MATH_RANDOM() - BEACON_DISTANCE
-      }
-    ],
-    rotationY: 0
+    x: Math.cos(angle) * BEACON_DISTANCE,
+    y: 6,
+    z: Math.sin(angle) * BEACON_DISTANCE,
+    rotationY: 0,
+    orbitY: angle
   }
 
-  w_addObjectToGrid(world.beacon, world.beacon.points[0]);
+  w_addObjectToGrid(world.beacon, world.beacon);
 }
 
 function w_addBlock(x, z) {
@@ -280,46 +358,48 @@ function w_addBlock(x, z) {
     var treeX = (x * BLOCK_SIZE) + (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2;
     var treeZ = (z * BLOCK_SIZE) + (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2;
 
-    for (var i = 0; i < height/4; i++) {
-      var treeY = i*4;
-      var newTreePoint = {
-        x: treeX,
-        y: treeY,
-        z: treeZ
-      };
+    if (true ||    (treeX > NO_TREE_DISTANCE || treeX < -1 * NO_TREE_DISTANCE)  &&  (treeZ > NO_TREE_DISTANCE || treeZ < -1 * NO_TREE_DISTANCE)  ) {
+      for (var i = 0; i < height/4; i++) {
+        var treeY = i*4;
+        var newTreePoint = {
+          x: treeX,
+          y: treeY,
+          z: treeZ
+        };
 
-      newTree.points.push(newTreePoint);
+        newTree.points.push(newTreePoint);
 
-      w_addObjectToGrid(newTree, newTreePoint);
+        w_addObjectToGrid(newTree, newTreePoint);
+      }
+
+      world.blocks[x][z].trees.push(newTree);
     }
-
-    world.blocks[x][z].trees.push(newTree);
   }
 
   // add monsters
-  if (numBlocks >= 9) {
+  if (numBlocks >= 9 && MATH_RANDOM() <= MONSTER_SPAWN_CHANCE) {
     var monsterX = (x * BLOCK_SIZE) + (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2;
     var monsterZ = (z * BLOCK_SIZE) + (MATH_RANDOM() * BLOCK_SIZE) - BLOCK_SIZE/2;
 
-    for (var n = 0; n < MONSTERS_PER_BLOCK; n++) {
-      var newMonster = {
-        type: 'monster',
-        points: [],
-        health: 3
-      }
-
-      for (var i=0; i<4; i++) {
-        var newMonsterPoint = {
-          x: monsterX,
-          y: i*2,
-          z: monsterZ
-        };
-        newMonster.points.push(newMonsterPoint);
-
-        w_addObjectToGrid(newMonster, newMonsterPoint);
-      }
-      world.monsters.push(newMonster);
+    var newMonster = {
+      type: 'monster',
+      points: [],
+      health: 3,
+      verticalVelocity: 0
     }
+
+    for (var i=0; i<4; i++) {
+      var newMonsterPoint = {
+        x: monsterX,
+        y: i*2,
+        z: monsterZ
+      };
+      newMonster.points.push(newMonsterPoint);
+
+      w_addObjectToGrid(newMonster, newMonsterPoint);
+    }
+    world.monsters.push(newMonster);
+  
   }
 
   numBlocks++;

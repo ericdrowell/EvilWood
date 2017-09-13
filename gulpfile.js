@@ -15,13 +15,15 @@ var cleanCSS = require('gulp-clean-css');
 
 var JS_SOURCES = [
   './src/js/glMatrix.custom.min.js',
+  './src/js/jsfxr.js',
   './src/js/config.js',
   './src/js/utils.js',
   './src/js/webgl.js',
   './src/js/shaders.js',
   './src/js/world.js',
   './src/js/player.js',
-  './src/js/audio.js',
+  './src/js/soundEffects.js',
+  './src/js/music.js',
   './src/js/view.js',
   './src/js/buffers.js',
   './src/js/controller.js'
@@ -57,14 +59,6 @@ gulp.task('html', function() {
   return gulp.src(['./src/index.html'])
     .pipe(replace('{{JS}}', fs.readFileSync('./tmp/main.js', 'utf8')))
     .pipe(replace('{{CSS}}', fs.readFileSync('./tmp/main.css', 'utf8')))
-    .pipe(replace('{{LEAVES_ENCODING}}', fs.readFileSync('./base64Textures/leaves.txt', 'utf8')))
-    .pipe(replace('{{TREE_ENCODING}}', fs.readFileSync('./base64Textures/tree.txt', 'utf8')))
-    .pipe(replace('{{GROUND_ENCODING}}', fs.readFileSync('./base64Textures/ground.txt', 'utf8')))
-    .pipe(replace('{{RED_ENCODING}}', fs.readFileSync('./base64Textures/red.txt', 'utf8')))
-    .pipe(replace('{{SHADOW_ENCODING}}', fs.readFileSync('./base64Textures/shadow.txt', 'utf8')))
-    .pipe(replace('{{MONSTER_ENCODING}}', fs.readFileSync('./base64Textures/monster.txt', 'utf8')))
-    .pipe(replace('{{ORANGE_ENCODING}}', fs.readFileSync('./base64Textures/orange.txt', 'utf8')))
-    .pipe(replace('{{WHITE_ENCODING}}', fs.readFileSync('./base64Textures/white.txt', 'utf8')))
     .pipe(gulp.dest('./build'));
 });
 

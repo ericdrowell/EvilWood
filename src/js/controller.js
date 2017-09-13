@@ -8,15 +8,11 @@ function c_init() {
   gl_init(); 
   c_resetGame();
   v_init();
+  a_init();
   c_attachListeners();
 }
 
 function c_resetGame() {
-  w_init();
-  p_init();
-  gameState = 'menu';
-  a_playMusic('menu');
-
   camera = {
     x: 0,
     y: PLAYER_HEIGHT,
@@ -24,6 +20,11 @@ function c_resetGame() {
     pitch: 0,
     yaw: 0
   };
+
+  w_init();
+  p_init();
+  gameState = 'menu';
+  a_playMusic('menu', 0.1);
 
   v_showMenuScreen();
 }
@@ -34,7 +35,7 @@ function c_handleKeyDown(evt) {
   switch (keycode) {
     case 65:
       // a key (strafe left)
-      if (gameState === 'playing') {
+      if (gameState === 'playing' && !player.isClimbing) {
         player.sideMovement = -1;
       }
       break;
@@ -46,7 +47,7 @@ function c_handleKeyDown(evt) {
       break;
     case 68:
       // d key (strafe right)
-      if (gameState === 'playing') {
+      if (gameState === 'playing' && !player.isClimbing) {
         player.sideMovement = 1;
       }
       break;
@@ -58,11 +59,11 @@ function c_handleKeyDown(evt) {
       break;
     case 32:
       // space key
-      if (gameState === 'playing') {
-        nearbyTree = w_getNearbyTree(camera);
+      if (gameState === 'playing' && !player.isClimbing) {
+        nearbyTree = w_getNearbyTree();
         if (nearbyTree) {
-          player.straightMovement = 1;
           player.isClimbing = true;
+          camera.y += JUMP_TREE_DISTANCE;
         }
       }
       break;
@@ -91,12 +92,6 @@ function c_handleKeyUp(evt) {
       // s key
       player.straightMovement = 0;
       break;
-    case 32:
-      // space key
-      if (player.isClimbing) {
-        player.straightMovement = 0;
-      }
-      break;
   }
 };
 
@@ -120,16 +115,22 @@ function c_isPointerLocked() {
   return document.pointerLockElement === canvas;
 }
 
-function c_handleClick(evt) {
-  // if pointer is not locked
-  if (gameState === 'menu' || gameState === 'paused') {
-    c_playGame();
-  } 
-  else if (gameState === 'playing') {
+function c_handleMouseDown(evt) {
+  var now = new Date().getTime()
+
+  if (gameState === 'playing') {
     p_fire();
   }
-  else if (gameState === 'won' || gameState === 'died') {
-    c_resetGame();
+  else if (now > openMenuTime + MENU_COOLDOWN*1000) {
+    if (gameState === 'menu' || gameState === 'paused') {
+      c_playGame();
+    } 
+    else if (gameState === 'playing') {
+      p_fire();
+    }
+    else if (gameState === 'won' || gameState === 'died') {
+      c_resetGame();
+    }
   }
 }
 
@@ -137,29 +138,29 @@ function c_playGame() {
   gameState = 'playing';
   canvas.requestPointerLock();
   v_hideScreen();
-  a_playMusic('play');
+  a_playMusic('play', 0.05);
 }
 
 function c_pauseGame() {
   gameState = 'paused';
-  a_playMusic('menu');
+  a_playMusic('menu', 0.1);
   v_showPausedScreen();
 }
 
 function c_win() {
   document.exitPointerLock();
   gameState = 'won';
-  a_playMusic('menu');
-  c_resetGame();
+  a_playMusic('menu', 0.1);
   v_showWinScreen();
 }
 
 function c_die() {
   document.exitPointerLock();
   gameState = 'died';
-  a_playMusic('menu');
-  c_resetGame();
+  a_playMusic('menu', 0.1);
   v_showDiedScreen();
+  //a_soundEffect('die');
+  aa.play('powerup');
 }
 
 function c_attachListeners() {
@@ -175,8 +176,8 @@ function c_attachListeners() {
     c_handleMouseMove(evt);
   }, false);
 
-  document.addEventListener('click', function(evt) {
-    c_handleClick(evt);
+  document.addEventListener('mousedown', function(evt) {
+    c_handleMouseDown(evt);
   }, false);
 
   document.addEventListener('pointerlockchange', function(evt) {
@@ -196,6 +197,7 @@ function c_gameLoop() {
     p_updatePlayerPos();
     w_updateLasers();
     w_updateMonsters();
+    w_updateBeacon();
     w_addBlocks(true); 
   }
 

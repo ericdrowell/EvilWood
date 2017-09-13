@@ -10,6 +10,7 @@ var camera = {};
 var textures = {};
 var overlayEl = document.getElementById('a');
 var healthEl = document.getElementById('b');
+var openMenuTime = 0;
 
 function v_init() {
   canvas.width = window.innerWidth;
@@ -22,20 +23,42 @@ function v_init() {
   });
 }
 
+function v_createTexture(colors) {
+  var canvas = document.createElement('canvas');
+  canvas.width = 16;
+  canvas.height = 16;
+  var context = canvas.getContext('2d');
+
+  for (var x=0; x<16; x++) {
+    for (var y=0; y<16; y++) {
+      context.save();
+      context.fillStyle = '#' + u_getRandomElement(colors);
+      context.fillRect(x, y, 2, 2);
+      context.restore();
+    }
+  }
+
+  return canvas.toDataURL();
+}
+
 function v_showMenuScreen() {
-  overlayEl.innerHTML = 'EVIL WOOD<br><br>YOU ARE LOST IN AN EVIL FOREST<br>CLIMB TREES TO SEE THE SKY<br>FIND THE RED BEACON TO ESCAPE<br>LET THE NORTH STAR GUIDE YOU<br>BEWARE THE DARK SOULS<br><br>' + INSTRUCTIONS_TEXT + '<br><br>CLICK SCREEN TO START'
+  overlayEl.innerHTML = 'EVIL WOOD<br><br>YOU ARE LOST IN AN EVIL FOREST<br>CLIMB TREES TO SEE THE SKY<br>LET THE NORTH STAR GUIDE YOU<br>FIND THE RED FAIRY TO ESCAPE<br>BEWARE THE DARK SOULS<br><br>' + INSTRUCTIONS_TEXT + '<br><br>CLICK SCREEN TO START'
+  openMenuTime = new Date().getTime();
 }
 
 function v_showPausedScreen() {
   overlayEl.innerHTML = 'PAUSED<br><br>' + INSTRUCTIONS_TEXT + '<br>CLICK SCREEN TO CONTINUE'
+  openMenuTime = new Date().getTime();
 }
 
 function v_showWinScreen() {
-  overlayEl.innerHTML = 'YOU WIN!<br><br>CONGRATULATIONS ON ESCAPING EVIL WOOD<br>YOUR CUNNING, SKILL, AND BRAVERY<br>SHALL BE REMEMBERED FOR ALL TIME<br><br>CLICK SCREEN TO PLAY AGAIN'
+  overlayEl.innerHTML = 'YOU WIN!<br><br>CONGRATULATIONS ON ESCAPING EVIL WOOD<br>YOUR CUNNING, SKILL, AND BRAVERY<br>WILL BE REMEMBERED FOR ALL TIME<br><br>CLICK SCREEN TO PLAY AGAIN'
+  openMenuTime = new Date().getTime();
 }
 
 function v_showDiedScreen() {
-  overlayEl.innerHTML = 'YOU DIED<br><br>DARK SOULS DEVOUR YOUR BODY<br>EVIL WOOD SLOWLY FADES AWAY<br>NONE SHALL KNOW OF YOUR HORRIFIC FATE<br><br>CLICK SCREEN TO TRY AGAIN'
+  overlayEl.innerHTML = 'YOU DIED<br><br>DARK SOULS DEVOUR YOUR BODY<br>DARKNESS FALLS AND EVIL WOOD FADES AWAY<br>YOUR HORRIFIC FATE IS LOST FOREVER<br><br>CLICK SCREEN TO TRY AGAIN'
+  openMenuTime = new Date().getTime();
 }
 
 function v_hideScreen() {
@@ -45,28 +68,72 @@ function v_hideScreen() {
 function v_loadTextures(callback) {
   textures = {
     tree: {
-      encoding: '{{TREE_ENCODING}}'
+      encoding: v_createTexture([
+        '4a493b', 
+        '534e3e', 
+        '3d3527', 
+        '524534', 
+        '46433b', 
+        '443e2b', 
+        '271c10'
+      ])
     },
     ground: {
-      encoding: '{{GROUND_ENCODING}}'
+      encoding: v_createTexture([
+        '2c2e20',
+        '282e26',
+        '303e1a',
+        '444b31',
+        '393c2c',
+        '33352f',
+        '333435',
+        '2c2e23',
+        '3d3f36',
+        '3d3a30',
+        '464339',
+        '514938',
+        '6a6554'
+      ])
     },
     leaves: {
-      encoding: '{{LEAVES_ENCODING}}'
+      encoding: v_createTexture([
+        '51531f',
+        '4e5315',
+        '545617',
+        '4c4d13',
+        '252108',
+        '33370a',
+        '474d13',
+        '383c0d',
+      ])
     },
     red: {
-      encoding: '{{RED_ENCODING}}'
+      encoding: v_createTexture(['ff0000'])
     },
     shadow: {
-      encoding: '{{SHADOW_ENCODING}}'
+      encoding: v_createTexture(['000000'])
     },
     monster: {
-      encoding: '{{MONSTER_ENCODING}}'
+      encoding: v_createTexture([
+        '5f3b88', 
+        '56367e',
+        '4d3279', 
+        '553783',
+        '412d6f', 
+        '3b2866',
+        '4b337a', 
+        '563986',
+        '4e3179', 
+        '54367f',
+        '663f8f', 
+        '382460'
+      ])
     },
     orange: {
-      encoding: '{{ORANGE_ENCODING}}'
+      encoding: v_createTexture(['ffcc00'])
     },
     white: {
-      encoding: '{{WHITE_ENCODING}}'
+      encoding: v_createTexture(['ffffff'])
     }
   };
 
@@ -92,24 +159,25 @@ function v_loadTextures(callback) {
 
 function v_renderBeacon() {
   var beacon = world.beacon;
-  var point = beacon.points[0];
 
   if (gameState !== 'won') {
     gl_save();
-    gl_translate(point.x, point.y, point.z);
+    gl_translate(beacon.x, beacon.y, beacon.z);
+    gl_rotate(beacon.rotationY, 0, 1, 0);
     gl_pushBuffers(buffers.cube, textures.red.glTexture, false);
     gl_drawElements(buffers.cube);
     gl_restore();
 
     // beacon shadow
     gl_save();
-    gl_translate(point.x, -1.99, point.z);
+    gl_translate(beacon.x, -1.99, beacon.z);
+    gl_rotate(beacon.rotationY, 0, 1, 0);
     gl_pushBuffers(buffers.cube, textures.shadow.glTexture, true);
     gl_drawElements(buffers.cube);
     gl_restore();
 
     // star
-    var starDirection = vec3.create([point.x - camera.x, 0, point.z - camera.z]);
+    var starDirection = vec3.create([beacon.x - camera.x, 0, beacon.z - camera.z]);
 
     vec3.normalize(starDirection); 
     gl_save();
