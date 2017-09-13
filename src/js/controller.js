@@ -24,7 +24,7 @@ function c_resetGame() {
   w_init();
   p_init();
   gameState = 'menu';
-  a_playMusic('menu', 0.1);
+  a_playMusic('menu', 0.4);
 
   v_showMenuScreen();
 }
@@ -138,29 +138,37 @@ function c_playGame() {
   gameState = 'playing';
   canvas.requestPointerLock();
   v_hideScreen();
-  a_playMusic('play', 0.05);
+  //a_playMusic('play', 0.05);
+  a_stopMusic();
+  aa.play('start')
 }
 
 function c_pauseGame() {
   gameState = 'paused';
-  a_playMusic('menu', 0.1);
+  a_playMusic('menu', 0.4);
   v_showPausedScreen();
 }
 
 function c_win() {
+  aa.play('player-win');
   document.exitPointerLock();
   gameState = 'won';
-  a_playMusic('menu', 0.1);
   v_showWinScreen();
+  
+  setTimeout(function() {
+    a_playMusic('menu', 0.4);
+  }, 1000)
+  
+  
 }
 
 function c_die() {
   document.exitPointerLock();
   gameState = 'died';
-  a_playMusic('menu', 0.1);
+  a_playMusic('menu', 0.4);
   v_showDiedScreen();
   //a_soundEffect('die');
-  aa.play('powerup');
+  aa.play('player-die');
 }
 
 function c_attachListeners() {

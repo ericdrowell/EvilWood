@@ -89,33 +89,40 @@ function a_initAudioContext() {
   songAudioContext = new AudioContext()
 }
 
+function a_stopMusic() {
+  if (musicTimeout) {
+    clearTimeout(musicTimeout);
+  }
+  a_initAudioContext();
+}
+
 function a_playMusic(music, volume) {
-  // var time = 0;
-  // var loops = [];
+  var time = 0;
+  var loops = [];
 
-  // if (musicTimeout) {
-  //   clearTimeout(musicTimeout);
-  // }
+  if (musicTimeout) {
+    clearTimeout(musicTimeout);
+  }
 
-  // a_initAudioContext();
+  a_initAudioContext();
 
 
-  // for (var n=0; n<1; n++) {
-  //   loops = loops.concat(MUSIC[music].notes);
-  // }
+  for (var n=0; n<1; n++) {
+    loops = loops.concat(MUSIC[music].notes);
+  }
 
-  // loops.forEach(function(note, n) {
-  //   var freq = note[0];
-  //   var duration = note[1];
-  //   var wait = note[2];
+  loops.forEach(function(note, n) {
+    var freq = note[0];
+    var duration = note[1];
+    var wait = note[2];
 
-  //   a_playSound(freq, time, duration, volume, songAudioContext);
-  //   time+=wait;
-  // });
+    a_playSound(freq, time, duration, volume, songAudioContext);
+    time+=wait;
+  });
 
-  // musicTimeout = setTimeout(function() {
-  //   a_playMusic(music, volume);
-  // }, time * 1000);
+  musicTimeout = setTimeout(function() {
+    a_playMusic(music, volume);
+  }, time * 1000);
 }
 
 

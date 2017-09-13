@@ -1,7 +1,7 @@
 var TREES_PER_BLOCK = 10;
 var MONSTER_SPAWN_CHANCE = 0.5;
-var BEACON_DISTANCE = 50;
-var BEACON_ORBIT_ROTATION_SPEEED = 0.03; // revolutions / s
+var BEACON_DISTANCE = 1000;
+var BEACON_ORBIT_SPEEED = 10; // units / s
 var GRID_CELL_SIZE = 2;
 var LASER_SPEED = 350; // units / s
 var LASER_EXPIRE = 1; // s

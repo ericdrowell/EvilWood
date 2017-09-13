@@ -64,9 +64,10 @@ function w_updateBeacon() {
   var rotationEachFrame = BEACON_ROTATION_SPEED * MATH_PI * 2 * elapsedTime / 1000;
   beacon.rotationY += rotationEachFrame;
 
-  var orbitEachFrame = BEACON_ORBIT_ROTATION_SPEEED * MATH_PI * 2 * elapsedTime / 1000;
+  var beaconOrbitDistance = BEACON_ORBIT_SPEEED * elapsedTime / 1000;
+  var orbitYEachFrame = Math.atan(beaconOrbitDistance / BEACON_DISTANCE);
 
-  beacon.orbitY += orbitEachFrame;
+  beacon.orbitY += orbitYEachFrame;
 
   w_removeGridCell(beacon);
 
@@ -99,6 +100,22 @@ function w_updateMonsters() {
 
       if (MATH_RANDOM() < MONSTER_CHANCE_TO_JUMP_PER_FRAME && monster.verticalVelocity === 0) {
         monster.verticalVelocity = (MATH_RANDOM() * (MONSTER_JUMP_MAX_VELOCITY-MONSTER_JUMP_MIN_VELOCITY)) + MONSTER_JUMP_MIN_VELOCITY;
+        var distanceFromPlayer = Math.sqrt(
+          Math.pow(camera.x - monster.points[0].x, 2) +
+          Math.pow(camera.y - monster.points[0].y, 2) +
+          Math.pow(camera.z - monster.points[0].z, 2)
+        );
+
+        distanceFromPlayer -= 50;
+        if (distanceFromPlayer < 1) {
+          distanceFromPlayer = 1;
+        }
+        volume = 1/distanceFromPlayer;
+
+        if (volume < 0.1) {
+          volume = 0.1;
+        }
+        aa.play('monster-jump', volume)
       }
 
       var verticalDistEachFrame = monster.verticalVelocity * elapsedTime / 1000;

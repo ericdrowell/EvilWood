@@ -96,7 +96,7 @@ function p_hurt() {
   
 
   if (!isHurting) {
-    //player.health -= 1;
+    player.health -= 1;
     //a_soundEffect('player-hurt');
     aa.play('monster-hit');
     setTimeout(function() {
